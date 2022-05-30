@@ -1,0 +1,37 @@
+/.vscode
+/db
+/install
+/__*
+form-filler*.json
+query*.xml
+smth.*
+/src/utils
+todo
+/test
+
+/__pycache__
+/db
+hypothesa.py
+/install
+testResults.json
+'testSts copy.json'
+testSts.json
+todo
+result.txt
+tokens.json
+chechDBLastUpdate.py
+*__pycache__*
+
+/tests
+
+*.ipynb
+warehouse/*/*secret*
+*secret*
+
+/testvenv
+/.idea
+tz.md
+
+'test zakaz.json'
+
+del_creator_env
