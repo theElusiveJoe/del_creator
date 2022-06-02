@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Выбор сервиса доставки</title>
+{% endblock %}
+
+{% block body%}
+<div class="container">
+    <h5>Выберете сервис доставки</h5>
+    {% for service_name, info in price_dict.items() %}
+    <form role="form" action="{{info[1]}}" method="GET">
+        <input type="submit" class="btn btn-primary" value="{{service_name}} ~ {{info[0]}} руб">
+    </form>
+    {% endfor %}
+
+</div>
+{% endblock %}
