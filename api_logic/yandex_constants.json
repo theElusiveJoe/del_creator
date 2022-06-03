@@ -2,7 +2,7 @@
     "items": [
       {
         "cost_currency": "RUB",
-        "cost_value": "100",
+        "cost_value": "0",
         "droppof_point": 1,
         "pickup_point": 0,
         "quantity": 1,

@@ -45,11 +45,11 @@ def yandex_get_cost(addr, info_from_gsheets):
     resp = requests.post(
         f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v1/check-price', headers=headers, data=json.dumps(post_body))
 
-    if print(resp.status_code) != 200:
+    if resp.status_code != 200:
         return 'error'
 
     cont = json.loads(str(resp.content, encoding='utf-8'))
-
+    print(cont)
     return cont['price']
 
 

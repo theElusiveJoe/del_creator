@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, make_response
 from api_logic.compose_data import count_delivery
 from api_logic.y_api import yandex_create
 
-from gsheets.gsheets_query import get_order_info_from_gsheetstring
+from db_logic.gsheets_query import get_order_info_from_gsheetstring
 
 import json
 
