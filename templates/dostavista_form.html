@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Форма YandexGo</title>
+<title>Форма Dostavista</title>
 
 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey={{ymaps_token}}" type="text/javascript"></script>
 <script type="text/javascript">
     ymaps.ready(init);
     function init() {
-        var suggestView1 = new ymaps.SuggestView('fullname');
+        var suggestView1 = new ymaps.SuggestView('address');
     }
 </script>
 
@@ -27,10 +27,10 @@
 <div class="container">
     <div class="container">
         <br>
-        <h3>Заполните форму для яндекс доставки</h3>
+        <h3>Заполните форму для Dostavista</h3>
         <br>
         <h5>{{errors}}</h5>
-        <form role="form" method="post" action="/yandex_form.html">
+        <form role="form" method="post" action="/dostavista_form.html">
             <!-- id заказа -->
             <div class="form-group w-50">
                 <label for="order_id">id заказа</label>
@@ -63,45 +63,45 @@
 required> -->
             <!-- </div> -->
             <div class=" form-group w-50">
-                <label for="fullname">адрес с городом</label>
-                <input type="text" class="form-control" id="fullname" name="fullname" placeholder="напр. Тверская улица 9Ас5" {% if
-                    cook.get('fullname'): %} value="{{cook.get('fullname')}}""
+                <label for="address">адрес с городом</label>
+                <input type="text" class="form-control" id="address" name="address" placeholder=" напр. Москва, Тверская улица 9Ас5" {% if
+                    cook.get('fullname'): %} value="{{cook.get('address')}}""
                 {% endif %}
                 required>
             </div>
             <div class=" form-group w-50">
-                <label for="porch">подъезд</label>
-                <input type="text" class="form-control" name="porch" placeholder="" {% if cook.get('porch'): %}
-                    value="{{cook.get('porch')}}""
+                <label for="entrance_number">подъезд</label>
+                <input type="text" class="form-control" name="entrance_number" placeholder="" {% if cook.get('porch'): %}
+                    value="{{cook.get('entrance_number')}}""
                     {% endif %}
 >
             </div>
             <div class=" form-group w-50">
-                <label for="door_code">домофон</label>
-                <input type="text" class="form-control" name="door_code" placeholder="" {% if cook.get('door_code'): %}
-                    value="{{cook.get('door_code')}}""
+                <label for="intercom_code">домофон</label>
+                <input type="text" class="form-control" name="intercom_code" placeholder="" {% if cook.get('door_code'): %}
+                    value="{{cook.get('intercom_code')}}""
                     {% endif %}
 >
             </div>
             <div class=" form-group w-50">
-                <label for="floor">этаж</label>
-                <input type="text" class="form-control" name="floor" placeholder="" {% if cook.get(''): %}
-                    value="{{cook.get('floor')}}""
+                <label for="floor_number">этаж</label>
+                <input type="text" class="form-control" name="floor_number" placeholder="" {% if cook.get(''): %}
+                    value="{{cook.get('floor_number')}}""
                 {% endif %}
 >
             </div>
             <div class=" form-group w-50">
-                <label for="flat">квартира</label>
-                <input type="text" class="form-control" name="flat" placeholder="" {% if cook.get('flat'): %}
-                    value="{{cook.get('flat')}}""
+                <label for="apartment_number">квартира/офис</label>
+                <input type="text" class="form-control" name="apartment_number" placeholder="" {% if cook.get('flat'): %}
+                    value="{{cook.get('apartment_number')}}""
                     {% endif %}
 >
             </div>
             <!-- комментарий -->
             <div class=" form-group w-50">
-                <label for="comment">комментарий для курьера</label>
-                <input type="text" class="form-control" name="comment" placeholder="" {% if cook.get('comment'): %}
-                    value="{{cook.get('comment')}}""
+                <label for="invisible_mile_navigation_instructions">комментарий для курьера</label>
+                <input type="text" class="form-control" name="invisible_mile_navigation_instructions" placeholder="" {% if cook.get('comment'): %}
+                    value="{{cook.get('invisible_mile_navigation_instructions')}}""
                     {% endif %}
 >
             </div>
@@ -109,5 +109,6 @@ required> -->
             <button class=" btn btn-primary" type="submit">Оформить вызов курьера</button>
         </form>
     </div>
+    <h6>тип доставки еще можно приделать</h6> 
 </div>
 {% endblock %}

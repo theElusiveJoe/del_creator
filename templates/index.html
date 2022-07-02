@@ -7,7 +7,7 @@
 <script type="text/javascript">
     ymaps.ready(init);
     function init() {
-        var suggestView1 = new ymaps.SuggestView('fullname');
+        var suggestView1 = new ymaps.SuggestView('address');
     }
 </script>
 {% endblock %}
@@ -17,8 +17,8 @@
     <h5>Введите свой адрес, чтобы узнать, услуги какокого сервиса будут дешевле</h5>
     <form role="form" action="/" method="POST">
         <div class="form-group w-50">
-            <label for="fullname">адрес</label>
-            <input type="text" class="form-control" id="fullname" name="fullname" placeholder="введите адрес"
+            <label for="address">адрес</label>
+            <input type="text" class="form-control" id="address" name="address" placeholder="введите адрес"
             value="Черепановых 32" required>
         </div>
         <div class="form-group w-50">

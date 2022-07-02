@@ -64,7 +64,7 @@ def get_order_info_from_gsheetstring(stringnum):
         'minlen': gabs[0]
     }
 
-    print(m)
+    print('from gsheets:', m)
     return m
 
 if __name__ == '__main__':

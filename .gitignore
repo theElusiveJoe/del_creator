@@ -35,3 +35,9 @@ tz.md
 'test zakaz.json'
 
 del_creator_env
+env2
+
+db_logic/db*
+db_logic/models.py
+
+*/*constants.json
