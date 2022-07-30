@@ -1,6 +1,7 @@
 import json
-from .yandex_go.yandex_go_api import yandex_get_cost
+from .yandex_go.yandex_go import yandex_get_cost
 # from .dostavista_api import dostavista_get_cost
+
 
 def count_delivery(addr, info_from_gsheets):
     """
@@ -9,7 +10,12 @@ def count_delivery(addr, info_from_gsheets):
         <сервис>: <цена>
         }
     """
-    return {
-        'Яндекс GO' : [yandex_get_cost(addr, info_from_gsheets), '/yandex_form.html'],
-        # 'Dostavista' :[dostavista_get_cost(addr, info_from_gsheets), '/dostavista_form.html']
-    }
+    return [
+        {
+            'label': 'Яндекс GO',
+            'cost': yandex_get_cost(addr, info_from_gsheets),
+            'url': '/yandex_form.html',
+            'name' : 'yandex_go'
+        },
+
+    ]

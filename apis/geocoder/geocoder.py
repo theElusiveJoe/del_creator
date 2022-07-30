@@ -2,9 +2,12 @@ import requests
 import json
 
 
+with open('tokens.json', 'r') as tf:
+    geocoder_token = json.load(tf)['geocoder']
+
 def address_to_coords(address, results_max_num=1):
     headers = {
-        'apikey': '7428d35f-cc5a-4ad4-92d8-76f19f0af700',
+        'apikey': geocoder_token,
         'geocode': address,
         'format' : 'json',
         'results': results_max_num

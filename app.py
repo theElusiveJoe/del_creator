@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, make_response
 
 from apis.compose_data import count_delivery
+from apis.yandex_go.yandex_go import yandex_create
+
 
 from db_logic.gsheets_query import get_order_info_from_gsheetstring
-
+from db_logic.gsheets_as_csv import get_order_line_from_ghseets
 import json
 
 import logging
@@ -22,12 +24,16 @@ def index():
 
     # считаем примерные цены доставок
     try:
-        info_from_gsheets = get_order_info_from_gsheetstring(request.form['stringnum'])
+        info_from_gsheets = get_order_line_from_ghseets(request.form['stringnum'].strip())
+        print(info_from_gsheets)
         delivery_prices = count_delivery(request.form['address'], info_from_gsheets)
     except:
         logging.exception('ОШИБКА')
 
-    res = make_response(render_template('choose_service.html', price_dict=delivery_prices))        
+    res = make_response(render_template('choose_service.html', price_dict=delivery_prices))
+    for service in delivery_prices:
+        res.set_cookie(service['name'] + '_cost', service['cost'])
+    res.set_cookie('yandex_delivery')   
     res.set_cookie("weight_kg", str(info_from_gsheets['weight']))
     res.set_cookie("address", request.form['address'])
     res.set_cookie("fullname", request.form['address'])
@@ -45,7 +51,7 @@ def yandex_form():
 
     # если же это POST, то пытаемся сздать заказ
     try:
-        code, cont = yandex_create(request.form)
+        code, cont = yandex_create(data=request.form, cookies=request.cookies)
     except:
         # это потом переделать
         logging.exception('Произошла ошибка при создании заказа dostavista')

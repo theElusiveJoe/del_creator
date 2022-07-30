@@ -5,10 +5,11 @@ import phonenumbers
 from ..geocoder.geocoder import address_to_coords
 
 
-headers = {
-    'Accept-Language': 'ru/ru',
-    'Authorization': 'Bearer AQAAAABgqYSBAAVM1XuVSQ7EbkGav6KkiZO_puY'
-}
+with open('tokens.json', 'r') as tf:
+    headers = {
+        'Accept-Language': 'ru/ru',
+        'Authorization': 'Bearer ' + json.load(tf)['yandex_go']
+    }
 
 
 def yandex_get_cost(addr, info_from_gsheets):
@@ -54,15 +55,15 @@ def yandex_get_cost(addr, info_from_gsheets):
     return cont['price']
 
 
-def yandex_create(data):
+def yandex_create(data, cookies):
     """
     принимает данные формы
     возвращает результат создания заказа
     """
 
-    to_post = json.load(open('api_logic/yandex_constants.json', 'r'))
+    to_post = json.load(open('apis/yandex_go/yandex_go_constants.json', 'r'))
 
-    to_post = fill_template(to_post, data)
+    to_post = fill_template(template=to_post, filler=data, filler_cookies=cookies)
 
     params = {
         'request_id': data['order_id']
@@ -85,11 +86,19 @@ def yandex_create(data):
     return resp.status_code, cont['message']
 
 
-def fill_template(template, filler):
+def fill_template(template, filler, filler_cookies):
     route_point = {
         'type': 'destination',
         'visit_order': 2,
-        'point_id': 1
+        'point_id': 1,
+        'payment_on_delivery':{
+            'payment_method' : 'card'
+        },
+        'external_order_cost': {
+            'value': filler_cookies['yandex_go_cost'],
+            'currency': 'рубли',
+            'currency_sign': 'руб'
+        }
     }
 
     addr_str = filler['fullname']
@@ -118,6 +127,9 @@ def fill_template(template, filler):
     }
 
     template['route_points'].append(route_point)
+
+    fisc = {}
+
 
     return template
 

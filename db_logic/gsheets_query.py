@@ -54,7 +54,8 @@ def get_order_info_from_gsheetstring(stringnum):
     for i in range(len(titles)-len(values) + 1):
         values.append('')
 
-    print(sorted(list(map(int, values[13].strip().replace('\\', '/').split('/')))))
+    # print(sorted(list(map(int, values[13].strip().replace('\\', '/').split('/')))))
+    
     gabs = (sorted(list(map(int, values[13].strip().replace('\\', '/').split('/')))))
     m = {
         'id': values[1].strip(),

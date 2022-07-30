@@ -7,9 +7,9 @@
 {% block body%}
 <div class="container">
     <h5>Выберете сервис доставки</h5>
-    {% for service_name, info in price_dict.items() %}
-    <form role="form" action="{{info[1]}}" method="GET">
-        <input type="submit" class="btn btn-primary" value="{{service_name}} ~ {{info[0]}} руб">
+    {% for service in price_dict %}
+    <form role="form" action="{{service['url']}}" method="GET">
+        <input type="submit" class="btn btn-primary" value="{{service['label']}} ~ {{service['cost']}} руб">
     </form>
     <br>
     

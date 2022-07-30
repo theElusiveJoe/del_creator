@@ -3,10 +3,10 @@ import json
 import phonenumbers
 import time
 
-
-headers = {
-    "X-DV-Auth-Token" : "A3775114139FE6FE4DF16B365D8FEA59F95D84A1" 
-}
+with open('tokens.json', 'r') as tf:
+    headers = {
+        "X-DV-Auth-Token" : json.load(tf)['dostavista']
+    }
 
 
 def dostavista_get_cost(addr, info_from_gsheets):
