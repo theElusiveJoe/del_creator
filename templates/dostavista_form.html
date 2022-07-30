@@ -12,14 +12,14 @@
 </script>
 
 <style>
-#suggest1{
-    width: 300px;
-    margin: 5px;
-}
+    #suggest1 {
+        width: 300px;
+        margin: 5px;
+    }
 
-.header {
-    padding: 5px;
-}
+    .header {
+        padding: 5px;
+    }
 </style>
 {% endblock %}
 
@@ -64,22 +64,23 @@ required> -->
             <!-- </div> -->
             <div class=" form-group w-50">
                 <label for="address">адрес с городом</label>
-                <input type="text" class="form-control" id="address" name="address" placeholder=" напр. Москва, Тверская улица 9Ас5" {% if
-                    cook.get('fullname'): %} value="{{cook.get('address')}}""
+                <input type="text" class="form-control" id="address" name="address"
+                    placeholder=" напр. Москва, Тверская улица 9Ас5" {% if cook.get('address'): %}
+                    value="{{cook.get('address')}}""
                 {% endif %}
                 required>
             </div>
             <div class=" form-group w-50">
                 <label for="entrance_number">подъезд</label>
-                <input type="text" class="form-control" name="entrance_number" placeholder="" {% if cook.get('porch'): %}
-                    value="{{cook.get('entrance_number')}}""
+                <input type="text" class="form-control" name="entrance_number" placeholder="" {% if cook.get('porch'):
+                    %} value="{{cook.get('entrance_number')}}""
                     {% endif %}
 >
             </div>
             <div class=" form-group w-50">
                 <label for="intercom_code">домофон</label>
-                <input type="text" class="form-control" name="intercom_code" placeholder="" {% if cook.get('door_code'): %}
-                    value="{{cook.get('intercom_code')}}""
+                <input type="text" class="form-control" name="intercom_code" placeholder="" {% if cook.get('door_code'):
+                    %} value="{{cook.get('intercom_code')}}""
                     {% endif %}
 >
             </div>
@@ -92,23 +93,33 @@ required> -->
             </div>
             <div class=" form-group w-50">
                 <label for="apartment_number">квартира/офис</label>
-                <input type="text" class="form-control" name="apartment_number" placeholder="" {% if cook.get('flat'): %}
-                    value="{{cook.get('apartment_number')}}""
+                <input type="text" class="form-control" name="apartment_number" placeholder="" {% if
+                    cook.get('apartment_number'): %} value="{{cook.get('apartment_number')}}""
                     {% endif %}
 >
             </div>
             <!-- комментарий -->
             <div class=" form-group w-50">
                 <label for="invisible_mile_navigation_instructions">комментарий для курьера</label>
-                <input type="text" class="form-control" name="invisible_mile_navigation_instructions" placeholder="" {% if cook.get('comment'): %}
+                <input type="text" class="form-control" name="invisible_mile_navigation_instructions" placeholder=""
+                    {%if cook.get('invisible_mile_navigation_instructions'): %}
                     value="{{cook.get('invisible_mile_navigation_instructions')}}""
                     {% endif %}
->
+                >
+            </div>
+
+            <div class=" form-group w-50">
+                <label for="required_datetime" class="form-label">время доставки</label>
+                <select class="form-select" name="required_datetime" required>
+                    {% for interval in intervals %}
+                    <option value="{{interval[0]}} {{interval[1]}}" {% if cook.get('required_datetime')==interval[0]
+                        + ' ' + interval[1]: %} selected {% endif %}> {{interval[2]}}</option>
+                    {% endfor %}
+                </select>
             </div>
             <br>
             <button class=" btn btn-primary" type="submit">Оформить вызов курьера</button>
         </form>
     </div>
-    <h6>тип доставки еще можно приделать</h6> 
 </div>
 {% endblock %}

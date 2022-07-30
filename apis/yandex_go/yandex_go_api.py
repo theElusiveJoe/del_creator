@@ -2,7 +2,8 @@ import requests
 import json
 import time
 import phonenumbers
-from .geocoder import address_to_coords
+from ..geocoder.geocoder import address_to_coords
+
 
 headers = {
     'Accept-Language': 'ru/ru',
@@ -68,7 +69,7 @@ def yandex_create(data):
     }
 
     resp = requests.post(
-        f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v2/claims/create', 
+        f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v2/claims/create',
         headers=headers, params=params, data=json.dumps(to_post)
     )
 
@@ -76,8 +77,9 @@ def yandex_create(data):
 
     if resp.status_code == 200:
         return resp.status_code, cont
+        
     print(cont['code'], '-code')
-    if resp.status_code == 400 and  'phone' in cont['code']:
+    if resp.status_code == 400 and 'phone' in cont['code']:
         return resp.status_code, 'Введен некорректный телефонный номер'
 
     return resp.status_code, cont['message']
@@ -90,7 +92,7 @@ def fill_template(template, filler):
         'point_id': 1
     }
 
-    addr_str =filler['fullname']
+    addr_str = filler['fullname']
     route_point['address'] = {
         'coordinates': address_to_coords(addr_str),
         'fullname': addr_str,
@@ -103,7 +105,8 @@ def fill_template(template, filler):
 
     try:
         phone = phonenumbers.parse(filler['phone'], 'RU')
-        phone = phonenumbers.format_number(phone, phonenumbers.PhoneNumberFormat().E164)
+        phone = phonenumbers.format_number(
+            phone, phonenumbers.PhoneNumberFormat().E164)
     except:
         logging.exception('OOPS, failed to parse phone')
         phone = filler['phone']

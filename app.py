@@ -1,9 +1,6 @@
 from flask import Flask, render_template, request, make_response
 
-from api_logic.compose_data import count_delivery
-from api_logic.y_api import yandex_create
-
-from api_logic.dostavista_api import dostavista_create 
+from apis.compose_data import count_delivery
 
 from db_logic.gsheets_query import get_order_info_from_gsheetstring
 
@@ -55,6 +52,7 @@ def yandex_form():
         return 'error occured'
 
     # создаем ответ
+
     res = make_response()
     
     # в куки ответа записываем все, что ввел клиент
@@ -76,32 +74,35 @@ def yandex_form():
 def dostavista_form():
     if request.method == 'GET':
         return render_template('dostavista_form.html', 
-        cook=request.cookies)
+        cook=request.cookies,
+        intervals=dostavista_intervals())
+    
+    
 
     try:
-        print('cookies:', request.cookies)
+        print('################cookies:###################', request.cookies)
+        print('###############FORM########################', request.form)
         code, cont = dostavista_create(request.form, request.cookies)
     except:
         # это потом переделать
         logging.exception('Произошла ошибка при создании заказа dostavista')
         return 'error occured'
 
-    # создаем ответ
-    res = make_response()
-    
-    # в куки ответа записываем все, что ввел клиент
-    for x in request.form:
-        res.set_cookie(x, request.form[x])
-
     # если удалось создать заказ, то выдаем страничку с успехом
     if code == 200:
+        # создаем ответ
+        res = make_response()
+        # в куки ответа записываем все, что ввел клиент
+        for x in request.form:
+            res.set_cookie(x, request.form[x])
         res.response = render_template('order_created.html')
         return res
 
     # если не удалось создать заявку, то возвращаем страничку с формой, 
     # но заполняем ее сообщением об ошибке и тем, что навводил клиент
-    res = make_response(render_template('dostavista_form.html', cook=request.form, errors=cont))    
-
+    res = make_response(render_template('dostavista_form.html', cook=request.form, errors=cont, intervals=dostavista_intervals()))    
+    for x in request.form:
+            res.set_cookie(x, request.form[x])
     return res
 
 if __name__ == '__main__':

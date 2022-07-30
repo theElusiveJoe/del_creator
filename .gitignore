@@ -40,4 +40,8 @@ env2
 db_logic/db*
 db_logic/models.py
 
-*/*constants.json
+*constants.json
+
+*.io
+
+venv*

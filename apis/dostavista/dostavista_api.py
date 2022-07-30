@@ -1,6 +1,7 @@
 import requests
 import json
 import phonenumbers
+import time
 
 
 headers = {
@@ -15,18 +16,10 @@ def dostavista_get_cost(addr, info_from_gsheets):
         "total_weight_kg" : info_from_gsheets['weight'],
         "points" : [
             {
-                "address" : "Москва, Складочная улица, 1с13",
-                "contact_person": {
-                    "phone" : " 89524587548",
-                    "name" : "uiwbrgo"
-                }
+                "address" : "Москва, Складочная улица, 1с13"
             },
             {
-                "address" : addr,
-                "contact_person": {
-                    "phone" : " 89524587548",
-                    "name" : "uiwbrgo"
-                },
+                "address" : addr
             }
 
         ]
@@ -55,6 +48,13 @@ def dostavista_get_cost(addr, info_from_gsheets):
 def dostavista_create(data, cookies):
     post_body = json.load(open('api_logic/dostavista_constants.json', 'r'))
 
+    try:
+        phone = phonenumbers.parse(data['phone'], 'RU')
+        phone = phonenumbers.format_number(phone, phonenumbers.PhoneNumberFormat().E164)
+        data[phone] = phone
+    except:
+        return 400, 'Некорректно введен телефон'
+
     post_body = fill_template(post_body, data, cookies)
 
     print(post_body)
@@ -78,20 +78,34 @@ def dostavista_create(data, cookies):
         return resp.status_code, cont['errors']
 
 
-def fill_template(template, filler, cookies):
-    try:
-        phone = phonenumbers.parse(filler['phone'], 'RU')
-        phone = phonenumbers.format_number(phone, phonenumbers.PhoneNumberFormat().E164)
-    except:
-        logging.exception('OOPS, failed to parse phone')
-        phone = filler['phone']
+def dostavista_intervals():
+    resp = requests.get(
+        f'https://robotapitest.dostavista.ru/api/business/1.1/delivery-intervals',
+        headers = headers
+    )
 
+    cont = json.loads(str(resp.content, encoding='utf-8'))
+
+    intervals = []
+
+    templ = '%Y-%m-%dT%H:%M:%S+03:00'
+    for inter in cont['delivery_intervals']:
+        a = time.strptime(inter['required_start_datetime'], templ)
+        b = time.strptime(inter['required_finish_datetime'], templ)
+        intervals.append([inter['required_start_datetime'] , inter['required_finish_datetime'], f'{a.tm_hour}:00 - {b.tm_hour}:00'])
+
+    return intervals
+
+
+def fill_template(template, filler, cookies):
     route_point = {
         "contact_person": {
-            "phone" : phone,
+            "phone" : filler['phone'],
             "name" : filler["name"]
         },
-        "client_order_id" : filler["order_id"]
+        "client_order_id" : filler["order_id"],
+        "required_start_datetime" : filler['required_datetime'].split()[0],
+        "required_finish_datetime" : filler['required_datetime'].split()[1]
     }
 
     for x in ["address", "entrance_number", "intercom_code", "floor_number", "apartment_number", "invisible_mile_navigation_instructions"]:
@@ -105,4 +119,4 @@ def fill_template(template, filler, cookies):
 
 
 if __name__ == '__main__':
-    print(dostavista_get_cost('тверская 4', {"weight": 5}))
+    dostavista_intervals()
