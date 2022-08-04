@@ -1,11 +1,11 @@
 import httplib2 
 import apiclient.discovery
 from oauth2client.service_account import ServiceAccountCredentials	
-
+import os, sys
 import xml.etree.ElementTree as ET
 import json
 
-with open('tokens.json', 'r') as f:
+with open(os.path.join(sys.path[0], 'tokens.json'), 'r') as f:
     tokens = json.load(f)
     api_mail = tokens['gsheets']['api_mail']
     SHEET_ID = tokens['gsheets']['SHEET_ID']

@@ -1,8 +1,9 @@
 import requests
 import json
+import os, sys
 
 
-with open('tokens.json', 'r') as tf:
+with open(os.path.join(sys.path[0], 'tokens.json'), 'r') as tf:
     geocoder_token = json.load(tf)['geocoder']
 
 def address_to_coords(address, results_max_num=1):

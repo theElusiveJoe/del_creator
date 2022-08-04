@@ -3,9 +3,10 @@ import json
 import time
 import phonenumbers
 from ..geocoder.geocoder import address_to_coords
+import os, sys
 
 
-with open('tokens.json', 'r') as tf:
+with open(os.path.join(sys.path[0], 'tokens.json'), 'r') as tf:
     headers = {
         'Accept-Language': 'ru/ru',
         'Authorization': 'Bearer ' + json.load(tf)['yandex_go']

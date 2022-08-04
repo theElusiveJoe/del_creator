@@ -2,8 +2,9 @@ import requests
 import json
 import phonenumbers
 import time
+import os, sys
 
-with open('tokens.json', 'r') as tf:
+with open(os.path.join(sys.path[0], 'tokens.json'), 'r') as tf:
     headers = {
         "X-DV-Auth-Token" : json.load(tf)['dostavista']
     }
