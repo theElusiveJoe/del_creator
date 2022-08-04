@@ -15,7 +15,6 @@ with open('tokens.json', 'r') as tokens:
     tokens = json.load(tokens)
 
 app = Flask(__name__)
-ymaps_api_key = ""
 
 
 @app.route('/', methods=['GET', 'POST'])
