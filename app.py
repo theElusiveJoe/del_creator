@@ -8,10 +8,10 @@ from db_logic.gsheets_query import get_order_info_from_gsheetstring
 from db_logic.gsheets_as_csv import get_order_line_from_ghseets
 import json
 
-import logging
+import logging, sys, os
 
 
-with open('tokens.json', 'r') as tokens:
+with open(os.path.join(sys.path[0],'tokens.json'), 'r') as tokens:
     tokens = json.load(tokens)
 
 app = Flask(__name__)
