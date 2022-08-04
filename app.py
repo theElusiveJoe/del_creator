@@ -20,7 +20,7 @@ app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
-        return render_template('index.html', ymaps_token=ymaps_api_key)
+        return render_template('index.html', ymaps_token=tokens["msk_ymaps"])
 
     try:
         info_from_gsheets = get_order_line_from_ghseets(
