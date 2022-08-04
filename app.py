@@ -92,7 +92,7 @@ def yandex_form():
     # если не удалось создать заявку, то возвращаем страничку с формой,
     # но заполняем ее сообщением об ошибке и тем, что навводил клиент
     res = make_response(render_template('yandex_form.html', cook=request.form,
-                        errors='ПРОИЗОШЛА ОШИБКА: '+cont, ymaps_token=ymaps_api_key))
+                        errors='ПРОИЗОШЛА ОШИБКА: '+cont, ymaps_token=tokens['msk_ymaps']))
 
     return res
 
