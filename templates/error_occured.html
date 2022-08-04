@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Произошла ошибка</title>
+{% endblock %}
+
+{% block body%}
+<div class="container">
+    <h3>Произошла ошибка.</h3>
+    {% if recomendation %} {{recomendation}} {% endif %}
+    <br>
+    {% if order_id %} id заказа: <b>{{order_id}}</b> <br>{% endif %}
+    Описание ошибки: {{error_reason}}
+    <form role="form" action="/" method="GET">
+        <input type="submit" class="btn btn-primary" value="Назад">
+    </form>
+    <br>
+</div>
+{% endblock %}

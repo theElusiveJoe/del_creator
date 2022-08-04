@@ -26,7 +26,3 @@ def address_to_coords(address, results_max_num=1):
         raise Exception('Parsing geocode responce')
 
     return [float(coords[0]), float(coords[1])]
-
-
-if __name__ == '__main__':
-   print(address_to_coords('Тверская 6'))

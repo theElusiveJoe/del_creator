@@ -47,11 +47,11 @@ def yandex_get_cost(addr, info_from_gsheets):
     resp = requests.post(
         f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v1/check-price', headers=headers, data=json.dumps(post_body))
 
-    if resp.status_code != 200:
-        return 'error'
-
     cont = json.loads(str(resp.content, encoding='utf-8'))
-    print(cont)
+
+    if resp.status_code != 200:
+        raise Exception()
+
     return cont['price']
 
 
@@ -63,7 +63,7 @@ def yandex_create(data, cookies):
 
     to_post = json.load(open('apis/yandex_go/yandex_go_constants.json', 'r'))
 
-    to_post = fill_template(template=to_post, filler=data, filler_cookies=cookies)
+    to_post = fill_template(constants=to_post, filler=data, filler_cookies=cookies)
 
     params = {
         'request_id': data['order_id']
@@ -79,14 +79,16 @@ def yandex_create(data, cookies):
     if resp.status_code == 200:
         return resp.status_code, cont
         
-    print(cont['code'], '-code')
+    print('RESP MESSAGE:', cont['message'])
     if resp.status_code == 400 and 'phone' in cont['code']:
         return resp.status_code, 'Введен некорректный телефонный номер'
 
     return resp.status_code, cont['message']
 
 
-def fill_template(template, filler, filler_cookies):
+def fill_template(constants, filler, filler_cookies):
+    template = constants['template']
+    # 1 создаем точку выгрузки
     route_point = {
         'type': 'destination',
         'visit_order': 2,
@@ -119,7 +121,7 @@ def fill_template(template, filler, filler_cookies):
     except:
         logging.exception('OOPS, failed to parse phone')
         phone = filler['phone']
-    print('PHONEEEEEEE', phone)
+        print('PHONEEEEEEE', phone)
 
     route_point['contact'] = {
         'name': filler['name'],
@@ -127,8 +129,32 @@ def fill_template(template, filler, filler_cookies):
     }
 
     template['route_points'].append(route_point)
+    
 
-    fisc = {}
+    # 2 создаём фиктивный товар
+    fake_item = {
+        "cost_currency": "RUB",
+        "cost_value": filler_cookies['yandex_go_cost'],
+        "droppof_point": 1,
+        "pickup_point": 0,
+        "quantity": 1,
+        "size": {
+          "height": int(filler_cookies['min_len'])/100,
+          "length": int(filler_cookies['max_len'])/100,
+          "width": int(filler_cookies['mid_len'])/100
+        },
+        "title": "набор пакетов",
+        "weight": float(filler_cookies['weight_kg']),
+        "fiscalization" : {
+            "article": "007",
+            "supplier_inn": constants['inn'],
+            "vat_code_str": "vat0"
+        }
+      }
+
+    template['items'].append(fake_item)
+
+    # print('FILLER:', filler)
 
 
     return template

@@ -14,6 +14,11 @@
 
 {% block body%}
 <div class="container">
+    <script>
+        if(!navigator.cookieEnabled) {
+        alert('В вашем браузере не разрешены куки. Пожалуйста, используйте другое приложение для оформления доставки.\nСерьезно. В этом браузере не заработает(((')
+    }
+    </script>
     <h5>Введите свой адрес, чтобы узнать, услуги какокого сервиса будут дешевле</h5>
     <form role="form" action="/" method="POST">
         <div class="form-group w-50">
@@ -22,8 +27,8 @@
             value="Черепановых 32" required>
         </div>
         <div class="form-group w-50">
-            <label for="stringnum">число, переданное менеджером</label>
-            <input type="text" class="form-control" name="stringnum" placeholder="" value=5 required>
+            <label for="stringnum">номер заказа, переданный менеджером</label>
+            <input type="text" class="form-control" name="stringnum" placeholder="" value="test2" required>
         </div>
         <!-- <div class="form-group w-50">
             <label for="name">имя</label>

@@ -10,12 +10,17 @@ def count_delivery(addr, info_from_gsheets):
         <сервис>: <цена>
         }
     """
-    return [
-        {
+    ret = []
+    
+    try:
+        yandex_cost = yandex_get_cost(addr, info_from_gsheets)
+        ret.append({
             'label': 'Яндекс GO',
-            'cost': yandex_get_cost(addr, info_from_gsheets),
+            'cost': yandex_cost,
             'url': '/yandex_form.html',
-            'name' : 'yandex_go'
-        },
+            'name': 'yandex_go'
+        })
+    except:
+        logging.exception(f'Ошибка yandex_get_cost({addr}, info_from_gsheets)')
 
-    ]
+    return ret
