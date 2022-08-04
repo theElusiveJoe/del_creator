@@ -62,7 +62,7 @@ def yandex_create(data, cookies):
     возвращает результат создания заказа
     """
 
-    to_post = json.load(open('apis/yandex_go/yandex_go_constants.json', 'r'))
+    to_post = json.load(open(os.path.join(sys.path[0],'apis/yandex_go/yandex_go_constants.json'), 'r'))
 
     to_post = fill_template(constants=to_post, filler=data, filler_cookies=cookies)
 
