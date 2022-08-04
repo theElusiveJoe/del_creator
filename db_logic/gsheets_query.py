@@ -9,7 +9,7 @@ with open(os.path.join(sys.path[0], 'tokens.json'), 'r') as f:
     tokens = json.load(f)
     api_mail = tokens['gsheets']['api_mail']
     SHEET_ID = tokens['gsheets']['SHEET_ID']
-    CREDENTIALS_FILE = tokens['gsheets']['CREDENTIALS_FILE']
+    CREDENTIALS_FILE = os.path.join(sys.path[0],tokens['gsheets']['CREDENTIALS_FILE'])
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
 
