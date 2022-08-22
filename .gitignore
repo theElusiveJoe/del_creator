@@ -45,3 +45,6 @@ db_logic/models.py
 *.io
 
 venv*
+
+api_mehods.md
+db.db
