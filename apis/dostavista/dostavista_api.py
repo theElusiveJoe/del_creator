@@ -47,7 +47,7 @@ def dostavista_get_cost(addr, info_from_gsheets):
          
 
 def dostavista_create(data, cookies):
-    post_body = json.load(open(os.path.join(sys.path[0],'api_logic/dostavista_constants.json'), 'r'))
+    post_body = json.load(open(os.path.join(sys.path[0],'constants/dostavista_constants.json'), 'r'))
 
     try:
         phone = phonenumbers.parse(data['phone'], 'RU')

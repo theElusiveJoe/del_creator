@@ -148,7 +148,7 @@ def yandex_create(data, cookies):
         return status
 
     constants = json.load(
-        open(os.path.join(sys.path[0], 'apis/yandex_go/yandex_go_constants.json'), 'r'))
+        open(os.path.join(sys.path[0], 'constants/yandex_go_constants.json'), 'r'))
     to_post = fill_template(constants=constants,
                             filler=data, filler_cookies=cookies)
     params = {'request_id': data['order_id']}
