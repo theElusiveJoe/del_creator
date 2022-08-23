@@ -3,8 +3,9 @@ import sys
 import sqlite3
 import time
 import logging
+from geopy.distance import geodesic
 
-from apis.yandex_go.yandex_go import yandex_get_smth
+from apis.yandex_go.yandex_go import yandex_get_smth, yandex_performer_position
 from apis.yandex_go.yandex_go import yandex_create, yandex_approve, yandex_repeat
 
 from bot import TG_Bot
@@ -15,6 +16,11 @@ class Checker:
         self.tg_bot = TG_Bot(db_path=db_path)
         self.tg_bot.start()
         self.db_path = db_path
+
+        with open(os.path.join(sys.path[0], 'constants/yandex_go_constants.json'), 'r') as yc:
+            yandex_constants = json.load(yc)
+        self.coords = (yandex_constants['template']['route_points'][0]['address']['coordinates'][1], 
+                    yandex_constants['template']['route_points'][0]['address']['coordinates'][0])
 
     def check_db_file_and_table(self):
         try:
@@ -75,9 +81,40 @@ class Checker:
                         статус: {status}\n
                         id: {yandex_get_smth(claim_id, 'id')}\n
                         claim_id: {claim_id}""")
-                elif status == 'cancelled':
+                elif status in ['cancelled', 'cancelled_with_payment', 'cancelled_with_items_on_hands', 'delivered_finish']:
                     self.delete_from_table(claim_id)
                     print('------ удаляем')
+                elif status == 'performer_found':
+                    if order[1] == 'arriving_allerted':
+                        continue
+
+                    performer_coords = yandex_performer_position(claim_id)
+                    if geodesic(performer_coords, self.coords).m < 1500:
+                        self.tg_bot.broadcast(
+                        f"""Курьер на подходе O_O\n
+                        id: {yandex_get_smth(claim_id, 'id')}\n
+                        claim_id: {claim_id}""")
+                        with sqlite3.connect(self.db_path) as conn:
+                            cur = conn.cursor()
+                            cur.execute(
+                            f"""UPDATE yandex_orders
+                            SET status = {'arriving_allerted'}
+                            WHERE id = {claim_id}
+                            ;""")
+                            conn.commit()
+                elif status == 'pickup_arrived':
+                    self.tg_bot.broadcast(
+                    f"""Курьер прибыл!!!!!\n
+                    id: {yandex_get_smth(claim_id, 'id')}\n
+                    claim_id: {claim_id}""")
+                    with sqlite3.connect(self.db_path) as conn:
+                        cur = conn.cursor()
+                        cur.execute(
+                        f"""UPDATE yandex_orders
+                        SET status = {'pickup_arrived'}
+                        WHERE id = {claim_id}
+                        ;""")
+                        conn.commit()    
             except Exception as e:
                 logging.exception(e)
 

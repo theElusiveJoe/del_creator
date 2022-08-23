@@ -244,3 +244,20 @@ def yandex_write_to_db(order_id, order_status):
 
 def yandex_repeat(claim_id):
     pass
+
+
+def yandex_performer_position(claim_id):
+    query_params = {
+        'claim_id': claim_id
+    }
+
+    resp = requests.get(
+        f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v1/claims/performer-position', headers=headers, params=query_params)
+
+    cont = json.loads(str(resp.content, encoding='utf-8'))
+
+    if resp.status_code != 200:
+        logging.critical(
+            f'\nИнформация по заявке{claim_id},\nкод ответа: {resp.status_code}\nрассшифровка: {cont["message"]}')
+
+    return cont['position']['lat'], cont['position']['lon']
