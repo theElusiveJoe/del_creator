@@ -72,7 +72,6 @@ class Checker:
                 if status == 'ready_for_approval':
                     # yandex_approve(claim_id)
                     print('------ аппрувнуть бы')
-                    self.tg_bot.broadcast(f'{time.asctime()} аппрувнуть бы {claim_id}')
                 elif status in ['new', 'estimating', 'accepted',
                                 'performer_lookup', 'performer_draft']:
                     print('------ всё хорошо, ничего не делаем')
