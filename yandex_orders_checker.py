@@ -3,6 +3,7 @@ import sys
 import sqlite3
 import time
 import logging
+import json
 from geopy.distance import geodesic
 
 from apis.yandex_go.yandex_go import yandex_get_smth, yandex_performer_position
