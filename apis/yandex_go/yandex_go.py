@@ -9,6 +9,10 @@ import logging
 import time
 import sqlite3
 
+handler = logging.StreamHandler(stream=sys.stdout)
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+log.addHandler(handler)
 
 with open(os.path.join(sys.path[0], 'tokens.json'), 'r') as tf:
     headers = {
@@ -102,7 +106,6 @@ def yandex_create(data, cookies):
         except:
             logging.exception('OOPS, failed to parse phone')
             phone = filler['phone']
-            print('PHONEEEEEEE', phone)
 
         route_point['contact'] = {
             'name': filler['name'],
@@ -140,12 +143,12 @@ def yandex_create(data, cookies):
 
     def yandex_get_status_after_estimating(claim_id):
         status = yandex_get_smth(claim_id, 'status')
-        print("➡ status :", status)
         while status == 'estimating' or status == 'new':
             time.sleep(1)
             status = yandex_get_smth(claim_id, 'status')
-            print("➡ status :", status)
         return status
+
+    log.info(f'YANDEX create "{data["order_id"]}":\n    попытка создать заказ')
 
     constants = json.load(
         open(os.path.join(sys.path[0], 'constants/yandex_go_constants.json'), 'r'))
@@ -160,22 +163,21 @@ def yandex_create(data, cookies):
 
     try:
         if resp.status_code == 200:
+            log.info(f'YANDEX create "{data["order_id"]}":\n    status_code: {resp.status_code}')
             claim_id, version = cont['id'], cont['version']
             status = yandex_get_status_after_estimating(claim_id)
-            print("➡ status :", status)
+            log.info(f'YANDEX create "{data["order_id"]}":\n    status: {status}')
             yandex_write_to_db(order_id=claim_id,
                                 order_status=status)
             return resp.status_code, ''
         else:
-            print('RESP STATUS CODE:', resp.status_code)
-            print('RESP MESSAGE:', cont['message'])
+            log.warning(f'YANDEX create "{data["order_id"]}":\n    status_code: {resp.status_code}\n    msg:{cont["message"]}')
     except:
-        logging.exception()
+        log.exception()
 
     if resp.status_code == 400 and 'phone' in cont['code']:
         return resp.status_code, 'Введен некорректный телефонный номер'
 
-    print("➡ cont[message] :", cont['message'])
     return resp.status_code, cont['message']
 
 
@@ -190,11 +192,11 @@ def yandex_approve(claim_id, version):
         f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v2/claims/accept', headers=headers, params=query_params, data=json.dumps(to_post))
 
     if resp.status_code == 200:
+        log.info(f'YANDEX approve"{claim_id}":\n    status_code: {resp.status_code} - APPROVED')
         return
 
     cont = json.loads(str(resp.content, encoding='utf-8'))
-    print(
-        f'\nИнформация по заявке{claim_id},\nкод ответа: {resp.status_code}\nрассшифровка: {cont["message"]}')
+    log.info(f'YANDEX approve"{claim_id}":\n    status_code: {resp.status_code} - APPROVED')
     raise Exception('Ошибка при одтверждении заявки')
 
 
@@ -238,7 +240,7 @@ def yandex_write_to_db(order_id, order_status):
             VALUES ("{order_id}", "{order_status}");
             """
         )
-        print(f'VALUES ("{order_id}", "{order_status}")')
+        log.info(f'YANDEX write_to_db\n    VALUES ("{order_id}", "{order_status}")')
         conn.commit()
 
 

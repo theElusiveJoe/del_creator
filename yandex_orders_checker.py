@@ -11,6 +11,8 @@ from apis.yandex_go.yandex_go import yandex_create, yandex_approve, yandex_repea
 
 from bot import TG_Bot
 
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+
 
 class Checker:
     def __init__(self, db_path='db.db'):
@@ -20,8 +22,13 @@ class Checker:
 
         with open(os.path.join(sys.path[0], 'constants/yandex_go_constants.json'), 'r') as yc:
             yandex_constants = json.load(yc)
-        self.coords = (yandex_constants['template']['route_points'][0]['address']['coordinates'][1], 
-                    yandex_constants['template']['route_points'][0]['address']['coordinates'][0])
+        self.coords = (yandex_constants['template']['route_points'][0]['address']['coordinates'][1],
+                       yandex_constants['template']['route_points'][0]['address']['coordinates'][0])
+
+        handler = logging.StreamHandler(stream=sys.stdout)
+        log = logging.getLogger(__name__)
+        log.addHandler(handler)
+        self.log = log
 
     def check_db_file_and_table(self):
         try:
@@ -33,7 +40,7 @@ class Checker:
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.cursor()
             cur.execute(
-            f"""CREATE TABLE IF NOT EXISTS  yandex_orders(
+                f"""CREATE TABLE IF NOT EXISTS  yandex_orders(
             id          TEXT PRIMARY KEY,
             status      Text
             );"""
@@ -45,12 +52,11 @@ class Checker:
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.cursor()
             cur.execute(
-            f"""DELETE FROM yandex_orders
+                f"""DELETE FROM yandex_orders
             WHERE id = "{claim_id}"
             ;"""
             )
             conn.commit()
-
 
     def check_all_orders(self):
         self.check_db_file_and_table()
@@ -67,16 +73,19 @@ class Checker:
         for order in orders:
             claim_id = order[0]
             status = yandex_get_smth(claim_id, 'status')
-            print('ORDER:', claim_id, status)
+            self.log.info(
+                f'CHECKER check_all "{claim_id}":\n    status: {status}')
             try:
                 if status == 'ready_for_approval':
+                    pass
                     # yandex_approve(claim_id)
-                    print('------ аппрувнуть бы')
+                    # print('------ аппрувнуть бы')
                 elif status in ['new', 'estimating', 'accepted',
                                 'performer_lookup', 'performer_draft']:
-                    print('------ всё хорошо, ничего не делаем')
+                    # print('------ всё хорошо, ничего не делаем')
+                    pass
                 elif status in ['failed', 'performer_not_found', 'cancelled_by_taxi', 'estimating_failed']:
-                    print('------ беда с заказом')
+                    # print('------ беда с заказом')
                     self.tg_bot.broadcast(
                         f"""❗️❗️❗️ОШИБКА ПРИ СОЗДАНИИ❗️❗️❗️\n
                         статус: {status}\n
@@ -84,7 +93,7 @@ class Checker:
                         claim_id: {claim_id}""")
                 elif status in ['cancelled', 'cancelled_with_payment', 'cancelled_with_items_on_hands', 'delivered_finish']:
                     self.delete_from_table(claim_id)
-                    print('------ удаляем')
+                    # print('------ удаляем')
                 elif status == 'performer_found':
                     if order[1] == 'arriving_allerted':
                         continue
@@ -92,38 +101,40 @@ class Checker:
                     performer_coords = yandex_performer_position(claim_id)
                     if geodesic(performer_coords, self.coords).m < 1500:
                         self.tg_bot.broadcast(
-                        f"""Курьер на подходе O_O\n
+                            f"""Курьер на подходе O_O\n
                         id: {yandex_get_smth(claim_id, 'id')}\n
                         claim_id: {claim_id}""")
                         with sqlite3.connect(self.db_path) as conn:
                             cur = conn.cursor()
                             cur.execute(
-                            f"""UPDATE yandex_orders
+                                f"""UPDATE yandex_orders
                             SET status = {'arriving_allerted'}
                             WHERE id = {claim_id}
                             ;""")
                             conn.commit()
                 elif status == 'pickup_arrived':
                     self.tg_bot.broadcast(
-                    f"""Курьер прибыл!!!!!\n
+                        f"""Курьер прибыл!!!!!\n
                     id: {yandex_get_smth(claim_id, 'id')}\n
                     claim_id: {claim_id}""")
                     with sqlite3.connect(self.db_path) as conn:
                         cur = conn.cursor()
                         cur.execute(
-                        f"""UPDATE yandex_orders
+                            f"""UPDATE yandex_orders
                         SET status = {'pickup_arrived'}
                         WHERE id = {claim_id}
                         ;""")
-                        conn.commit()    
+                        conn.commit()
             except Exception as e:
                 logging.exception(e)
 
     def run(self, sleep_time=30):
         while True:
-            print(time.asctime())
+            # print(time.asctime())
             self.check_all_orders()
             time.sleep(sleep_time)
 
+
 if __name__ == '__main__':
+    print('checker started')
     Checker(db_path='db.db').run(sleep_time=3)

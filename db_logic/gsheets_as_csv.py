@@ -1,15 +1,22 @@
 import pandas as pd
+import logging
+import sys
+
+handler = logging.StreamHandler(stream=sys.stdout)
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+log.addHandler(handler)
 
 
 def get_order_line_from_ghseets(order_id):
+    log.info(f'GSHEETS get_line "{order_id}"')
     try:
         table = pd.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vQMGGZJHaIPgIpVqpmKQDBhjDWGugEC0p5oUsLNQOPKglSXiTizPigWZMuXGJq-p2XO8MeVPjTGPrIw/pub?gid=1543875454&single=true&output=csv',
                             header=1, usecols=[x for x in range(19)], index_col='Заказ')
         row = table.loc[order_id]
-        print(type(row), row)
-        # row = row.to_dict()
         if row['габариты']:
-            gabs = (sorted(list(map(int, row['габариты'].strip().replace('\\', '/').split('/')))))
+            gabs = (
+                sorted(list(map(int, row['габариты'].strip().replace('\\', '/').split('/')))))
         else:
             gabs = [0.5, 0.5, 0.5]
         ret = {
@@ -19,10 +26,10 @@ def get_order_line_from_ghseets(order_id):
             'midlen': gabs[1],
             'minlen': gabs[0]
         }
-        print('ГУГЛ ТАБЛИЦА НОРМАЛЬНО ОТРАБОТАЛА')
+        log.info(f'GSHEETS get_line "{order_id}" - correct')
         return ret
     except:
-        print('ПРОБЛЕМЫ С ГУГЛ ТАБЛИЦЕЙ')
+        log.warning(f'GSHEETS get_line "{order_id}" - error')
         raise Exception('Проблемы с гугл таблицей')
 
 

@@ -10,6 +10,10 @@ import json
 
 import logging, sys, os
 
+handler = logging.StreamHandler(stream=sys.stdout)
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+log.addHandler(handler)
 
 with open(os.path.join(sys.path[0],'tokens.json'), 'r') as tokens:
     tokens = json.load(tokens)
@@ -26,7 +30,7 @@ def index():
         info_from_gsheets = get_order_line_from_ghseets(
             request.form['stringnum'].strip())
     except:
-        logging.exception(
+        log.exception(
             f'Ошибка гугл таблиц: {request.form["stringnum"].strip()}')
         return render_template('error_occured.html',
                                error_reason='Проблема с базой данных или гугл таблицами',
@@ -39,7 +43,7 @@ def index():
         if not delivery_prices:
             raise Exception('Не удалось рассчитать доставку ни одним сервисом')
     except:
-        logging.exception(
+        log.exception(
             f'Ошибка рассчёта стоимости: {request.form["stringnum"].strip()}')
         return render_template('error_occured.html',
                                error_reason='Не удалось получить стоимость доставки ни от одного сервиса',
@@ -74,7 +78,7 @@ def yandex_form():
         code, cont = yandex_create(data=request.form, cookies=request.cookies)
     except:
         # это потом переделать
-        logging.exception('Произошла ошибка при создании заказа яндекс go')
+        log.exception('Произошла ошибка при создании заказа яндекс go')
         return 'Произошла внутренняя ошибка. Пожалуйста, свяжитесь с менеджером'
 
     # создаем ответ
@@ -108,7 +112,7 @@ def dostavista_form():
         code, cont = dostavista_create(request.form, request.cookies)
     except:
         # это потом переделать
-        logging.exception('Произошла ошибка при создании заказа dostavista')
+        log.exception('Произошла ошибка при создании заказа dostavista')
         return 'error occured'
 
     # если удалось создать заказ, то выдаем страничку с успехом

@@ -10,13 +10,13 @@ import logging
 class TG_Bot():
     def __init__(self, db_path='db.db'):
         def start_hf(update, context):
-            print('NEW CHAT, ID:', update.effective_chat.id)
+            # print('NEW CHAT, ID:', update.effective_chat.id)
             self.add_chat_id(update.effective_chat.id)
             context.bot.send_message(chat_id=update.effective_chat.id,
                                      text="Теперь сюда будет поступать рассылка по заказам")
 
         def stop_hf(update, context):
-            print('DELETE CHAT, ID:', update.effective_chat.id)
+            # print('DELETE CHAT, ID:', update.effective_chat.id)
             self.delete_chat_id(update.effective_chat.id)
             context.bot.send_message(chat_id=update.effective_chat.id,
                                      text="Рассылка по заказам приостановлена")
@@ -71,7 +71,7 @@ class TG_Bot():
 
     def add_chat_id(self, new_id):
         self.check_db_file_and_table()
-        print('NEWID:', new_id)
+        # print('NEWID:', new_id)
         with sqlite3.connect(self.db_file_path) as conn:
             cur = conn.cursor()
             cur.execute(
@@ -97,6 +97,5 @@ if __name__ == '__main__':
 
     while True:
         bot.start()
-        print('chats:', bot.get_chat_ids())
         bot.broadcast(f'time {time.time()}')
         time.sleep(3)
