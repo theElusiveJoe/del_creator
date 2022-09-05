@@ -93,12 +93,14 @@ def yandex_create(data, cookies):
             'coordinates': address_to_coords(addr_str),
             'fullname': addr_str,
         }
-        route_point['address']['comment'].replace('order_num', filler["order_id"])
 
         keys = ['porch', 'door_code', 'floor', 'flat', 'comment']
         for key in keys:
             if filler[key] != '':
                 route_point[key] = filler[key]
+        
+        if 'comment' in route_point['address']:
+            route_point['address']['comment'].replace('order_num', filler["order_id"])
 
         try:
             phone = phonenumbers.parse(filler['phone'], 'RU')
