@@ -93,6 +93,7 @@ def yandex_create(data, cookies):
             'coordinates': address_to_coords(addr_str),
             'fullname': addr_str,
         }
+        route_point['address']['comment'].replace('order_num', filler["order_id"])
 
         keys = ['porch', 'door_code', 'floor', 'flat', 'comment']
         for key in keys:
