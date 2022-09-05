@@ -77,8 +77,7 @@ class Checker:
                 f'CHECKER check_all "{claim_id}":\n    status: {status}')
             try:
                 if status == 'ready_for_approval':
-                    pass
-                    # yandex_approve(claim_id)
+                    yandex_approve(claim_id)
                     # print('------ аппрувнуть бы')
                 elif status in ['new', 'estimating', 'accepted',
                                 'performer_lookup', 'performer_draft']:
