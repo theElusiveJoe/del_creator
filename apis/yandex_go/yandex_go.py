@@ -72,7 +72,11 @@ def yandex_create(data, cookies):
 
     def fill_template(constants, filler, filler_cookies):
         template = constants['template']
-        # 1 создаем точку выгрузки
+
+        # подменяем номер заказа в комментариях для курьера
+        template["route_points"][0]["address"]["comment"] = template["route_points"][0]["address"]["comment"].replace('order_num', filler["order_id"])
+
+        # 1 создаем точку доставки покупателя
         route_point = {
             'type': 'destination',
             'visit_order': 2,
@@ -94,25 +98,34 @@ def yandex_create(data, cookies):
             'fullname': addr_str,
         }
 
-        keys = ['porch', 'door_code', 'floor', 'flat', 'comment']
+        keys = ['porch', 'door_code', 'sfloor', 'sflat', 'comment']
+        print('######FILLER:\n' ,filler)
         for key in keys:
             if filler[key] != '':
-                route_point[key] = filler[key]
+                route_point["address"][key] = filler[key]
+        print(route_point)
         
-        if 'comment' in route_point['address']:
-            route_point['address']['comment'].replace('order_num', filler["order_id"])
-
         try:
-            phone = phonenumbers.parse(filler['phone'], 'RU')
+            phone = filler['phone']
+            print('PHONEEEE', phone)
+            if not (phone[0] == '+'):
+                print('not + ')
+                if phone[0] == '8':
+                    phone = '+7' + phone[1:]
+                else:
+                    raise Exception()
+            print('PHONEEEE', phone, 2)
+            phone = phonenumbers.parse(phone, 'RU')
             phone = phonenumbers.format_number(
                 phone, phonenumbers.PhoneNumberFormat().E164)
+            print('PHONEEEE', phone, 3)
         except:
             logging.exception('OOPS, failed to parse phone')
             phone = filler['phone']
 
         route_point['contact'] = {
             'name': filler['name'],
-            'phone': filler['phone']
+            'phone': phone
         }
 
         template['route_points'].append(route_point)
@@ -166,15 +179,19 @@ def yandex_create(data, cookies):
 
     try:
         if resp.status_code == 200:
-            log.info(f'YANDEX create "{data["order_id"]}":\n    status_code: {resp.status_code}')
+            log.info(
+                f'YANDEX create "{data["order_id"]}":\n    status_code: {resp.status_code}')
             claim_id, version = cont['id'], cont['version']
             status = yandex_get_status_after_estimating(claim_id)
-            log.info(f'YANDEX create "{data["order_id"]}":\n    status: {status}')
+            log.info(
+                f'YANDEX create "{data["order_id"]}":\n    status: {status}')
             yandex_write_to_db(order_id=claim_id,
-                                order_status=status)
+                               order_status=status,
+                               order_version=version)
             return resp.status_code, ''
         else:
-            log.warning(f'YANDEX create "{data["order_id"]}":\n    status_code: {resp.status_code}\n    msg:{cont["message"]}')
+            log.warning(
+                f'YANDEX create "{data["order_id"]}":\n    status_code: {resp.status_code}\n    msg:{cont["message"]}')
     except:
         log.exception()
 
@@ -195,11 +212,13 @@ def yandex_approve(claim_id, version):
         f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v2/claims/accept', headers=headers, params=query_params, data=json.dumps(to_post))
 
     if resp.status_code == 200:
-        log.info(f'YANDEX approve"{claim_id}":\n    status_code: {resp.status_code} - APPROVED')
+        log.info(
+            f'YANDEX approve "{claim_id}":\n    status_code: {resp.status_code} - APPROVED')
         return
 
     cont = json.loads(str(resp.content, encoding='utf-8'))
-    log.info(f'YANDEX approve"{claim_id}":\n    status_code: {resp.status_code} - APPROVED')
+    log.info(
+        f'YANDEX approve"{claim_id}":\n    status_code: {resp.status_code} - APPROVED')
     raise Exception('Ошибка при одтверждении заявки')
 
 
@@ -220,7 +239,24 @@ def yandex_get_smth(claim_id, smth=None):
     return cont[smth]
 
 
-def yandex_write_to_db(order_id, order_status):
+def yandex_get_all_info(claim_id, smth=None):
+    query_params = {
+        'claim_id': claim_id
+    }
+
+    resp = requests.post(
+        f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v2/claims/info', headers=headers, params=query_params)
+
+    cont = json.loads(str(resp.content, encoding='utf-8'))
+
+    if resp.status_code != 200:
+        logging.critical(
+            f'\nИнформация по заявке{claim_id},\nкод ответа: {resp.status_code}\nрассшифровка: {cont["message"]}')
+
+    return cont
+
+
+def yandex_write_to_db(order_id, order_status, order_version):
     try:
         db_file_path = os.path.join(sys.path[0], 'db.db')
         with open(db_file_path, 'x') as fp:
@@ -233,17 +269,19 @@ def yandex_write_to_db(order_id, order_status):
         cur.execute(
             f"""CREATE TABLE IF NOT EXISTS yandex_orders(
             id          TEXT PRIMARY KEY,
-            status      Text
+            status      Text,
+            version     INTEGER
             );"""
         )
         conn.commit()
 
         cur.execute(
-            f"""INSERT OR IGNORE INTO yandex_orders (id, status)
-            VALUES ("{order_id}", "{order_status}");
+            f"""INSERT OR IGNORE INTO yandex_orders (id, status, version)
+            VALUES ("{order_id}", "{order_status}", {order_version});
             """
         )
-        log.info(f'YANDEX write_to_db\n    VALUES ("{order_id}", "{order_status}")')
+        log.info(
+            f'YANDEX write_to_db\n    VALUES ("{order_id}", "{order_status}", ver={order_version})')
         conn.commit()
 
 
@@ -266,3 +304,4 @@ def yandex_performer_position(claim_id):
             f'\nИнформация по заявке{claim_id},\nкод ответа: {resp.status_code}\nрассшифровка: {cont["message"]}')
 
     return cont['position']['lat'], cont['position']['lon']
+

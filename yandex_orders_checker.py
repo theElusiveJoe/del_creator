@@ -22,8 +22,10 @@ class Checker:
 
         with open(os.path.join(sys.path[0], 'constants/yandex_go_constants.json'), 'r') as yc:
             yandex_constants = json.load(yc)
-        self.coords = (yandex_constants['template']['route_points'][0]['address']['coordinates'][1],
-                       yandex_constants['template']['route_points'][0]['address']['coordinates'][0])
+        self.coords = (yandex_constants['template']['route_points'][0]
+                       ['address']['coordinates'][1],
+                       yandex_constants['template']['route_points'][0]
+                       ['address']['coordinates'][0])
 
         handler = logging.StreamHandler(stream=sys.stdout)
         log = logging.getLogger(__name__)
@@ -47,7 +49,7 @@ class Checker:
             )
             conn.commit()
 
-    def delete_from_table(self, claim_id):
+    def delete_from_db(self, claim_id):
         self.check_db_file_and_table()
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.cursor()
@@ -58,72 +60,103 @@ class Checker:
             )
             conn.commit()
 
+    def set_status_in_db(self, claim_id, new_status):
+        with sqlite3.connect(self.db_path) as conn:
+                            cur = conn.cursor()
+                            cur.execute(
+                                f"""UPDATE yandex_orders
+                            SET status = "{new_status}"
+                            WHERE id = {claim_id}
+                            ;""")
+                            conn.commit()
+
     def check_all_orders(self):
         self.check_db_file_and_table()
 
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.cursor()
             cur.execute(
-                f"""SELECT id, status FROM yandex_orders
+                f"""SELECT id, status, version FROM yandex_orders
             ORDER BY status;
             """
             )
             orders = cur.fetchall()
 
         for order in orders:
-            claim_id = order[0]
+            claim_id, status_in_db, version_in_db = order
             status = yandex_get_smth(claim_id, 'status')
             self.log.info(
                 f'CHECKER check_all "{claim_id}":\n    status: {status}')
+
+            # Бот пишет в чат при следующих событиях:
+            # * old_bd_status -> подтвердили -> approvement_allerted
+            # * old_bd_status -> курьер на подходе -> vicinity_allerted
+            # * vicinity_allerted -> курьер прибыл -> arrivival_allerted
+            # * заказ окончен или отменен ->удалить из бд
+            # * ошибка с заказом -> удалить из бд
             try:
                 if status == 'ready_for_approval':
-                    yandex_approve(claim_id)
                     # print('------ аппрувнуть бы')
+                    yandex_approve(claim_id, version_in_db)
+                    self.tg_bot.broadcast(
+                        f"""🆕🆕🆕 Поступил и был подтвержден новый заказ 🆕🆕🆕\n
+                        id: {yandex_get_smth(claim_id, 'id')}\n
+                        claim_id: {claim_id}""")
+                    self.set_status_in_db(claim_id, 'approvement_allerted')
+
                 elif status in ['new', 'estimating', 'accepted',
                                 'performer_lookup', 'performer_draft']:
                     # print('------ всё хорошо, ничего не делаем')
                     pass
-                elif status in ['failed', 'performer_not_found', 'cancelled_by_taxi', 'estimating_failed']:
+
+                elif status in ['failed', 'performer_not_found', \
+                    'cancelled_by_taxi', 'estimating_failed']:
                     # print('------ беда с заказом')
                     self.tg_bot.broadcast(
-                        f"""❗️❗️❗️ОШИБКА ПРИ СОЗДАНИИ❗️❗️❗️\n
+                        f"""❗️❗️❗️ ОШИБКА С ЗАКАЗОМ ❗️❗️❗️\n
                         статус: {status}\n
                         id: {yandex_get_smth(claim_id, 'id')}\n
-                        claim_id: {claim_id}""")
-                elif status in ['cancelled', 'cancelled_with_payment', 'cancelled_with_items_on_hands', 'delivered_finish']:
-                    self.delete_from_table(claim_id)
-                    # print('------ удаляем')
-                elif status == 'performer_found':
-                    if order[1] == 'arriving_allerted':
-                        continue
+                        claim_id: {claim_id}"""
+                    )
+                    self.delete_from_db(claim_id)
 
-                    performer_coords = yandex_performer_position(claim_id)
-                    if geodesic(performer_coords, self.coords).m < 1500:
-                        self.tg_bot.broadcast(
-                            f"""Курьер на подходе O_O\n
-                        id: {yandex_get_smth(claim_id, 'id')}\n
-                        claim_id: {claim_id}""")
-                        with sqlite3.connect(self.db_path) as conn:
-                            cur = conn.cursor()
-                            cur.execute(
-                                f"""UPDATE yandex_orders
-                            SET status = {'arriving_allerted'}
-                            WHERE id = {claim_id}
-                            ;""")
-                            conn.commit()
-                elif status == 'pickup_arrived':
+                elif status in ['cancelled', 'cancelled_with_payment', \
+                    'cancelled_with_items_on_hands']:
+                    # print('------ удаляем')
+                    self.delete_from_db(claim_id)
                     self.tg_bot.broadcast(
-                        f"""Курьер прибыл!!!!!\n
-                    id: {yandex_get_smth(claim_id, 'id')}\n
-                    claim_id: {claim_id}""")
-                    with sqlite3.connect(self.db_path) as conn:
-                        cur = conn.cursor()
-                        cur.execute(
-                            f"""UPDATE yandex_orders
-                        SET status = {'pickup_arrived'}
-                        WHERE id = {claim_id}
-                        ;""")
-                        conn.commit()
+                        f"""❔❔❔ Заказ отменен ❔❔❔\n
+                        id: {yandex_get_smth(claim_id, 'id')}\n
+                        claim_id: {claim_id}"""
+                    )
+
+                elif status == 'delivered_finish':
+                    self.delete_from_db(claim_id)
+                    self.tg_bot.broadcast(
+                        f"""✅✅✅ Доставка успешно завершена ✅✅✅\n
+                        id: {yandex_get_smth(claim_id, 'id')}\n
+                        claim_id: {claim_id}"""
+                    )
+
+                elif status == 'performer_found' and not (status_in_db == 'vicinity_allerted'):
+                    performer_coords = yandex_performer_position(claim_id)
+
+                    if geodesic(performer_coords, self.coords).m < 500:
+                        self.tg_bot.broadcast(
+                            f"""🚶‍♂️🚶‍♂️🚶‍♂️Курьер на подходе🚶‍♂️🚶‍♂️🚶‍♂️\n
+                            id: {yandex_get_smth(claim_id, 'id')}\n
+                            claim_id: {claim_id}"""
+                        )
+                        self.set_status_in_db(claim_id, 'vicinity_allerted')
+
+                elif status == 'pickup_arrived' and not (status_in_db == 'arrival_allerted'):                    
+                    self.tg_bot.broadcast(
+                        f"""📦📦📦Курьер прибыл📦📦📦\n
+                        id: {yandex_get_smth(claim_id, 'id')}\n
+                        claim_id: {claim_id}"""
+                    )
+                    self.set_status_in_db(claim_id, 'arrival_allerted')
+
             except Exception as e:
                 logging.exception(e)
 

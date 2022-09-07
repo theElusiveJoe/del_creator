@@ -84,16 +84,16 @@ required> -->
 >
             </div>
             <div class=" form-group w-50">
-                <label for="floor">этаж</label>
-                <input type="text" class="form-control" name="floor" placeholder="" {% if cook.get(''): %}
-                    value="{{cook.get('floor')}}""
+                <label for="sfloor">этаж</label>
+                <input type="text" class="form-control" name="sfloor" placeholder="" {% if cook.get(''): %}
+                    value="{{cook.get('sfloor')}}""
                 {% endif %}
 >
             </div>
             <div class=" form-group w-50">
-                <label for="flat">квартира</label>
-                <input type="text" class="form-control" name="flat" placeholder="" {% if cook.get('flat'): %}
-                    value="{{cook.get('flat')}}""
+                <label for="sflat">квартира</label>
+                <input type="text" class="form-control" name="sflat" placeholder="" {% if cook.get('sflat'): %}
+                    value="{{cook.get('sflat')}}""
                     {% endif %}
 >
             </div>
