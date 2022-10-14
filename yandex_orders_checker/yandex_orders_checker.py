@@ -6,17 +6,17 @@ import logging
 import json
 from geopy.distance import geodesic
 
-from apis.yandex_go.yandex_go import yandex_get_smth, yandex_performer_position
-from apis.yandex_go.yandex_go import yandex_create, yandex_approve, yandex_repeat
+from apis.yandex_go_user.yandex_go import yandex_get_smth, yandex_performer_position
+from apis.yandex_go_user.yandex_go import yandex_approve
 
-from bot import TG_Bot
+from yandex_orders_checker.bot import Tg_Bot
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
 class Checker:
     def __init__(self, db_path='db.db'):
-        self.tg_bot = TG_Bot(db_path=db_path)
+        self.tg_bot = Tg_Bot(db_path=db_path)
         self.tg_bot.start()
         self.db_path = db_path
 

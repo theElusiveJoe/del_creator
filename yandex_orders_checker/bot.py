@@ -4,10 +4,9 @@ import sys
 import json
 import time
 import sqlite3
-import logging
 
 
-class TG_Bot():
+class Tg_Bot():
     def __init__(self, db_path='db.db'):
         def start_hf(update, context):
             # print('NEW CHAT, ID:', update.effective_chat.id)
@@ -93,7 +92,7 @@ class TG_Bot():
 
 
 if __name__ == '__main__':
-    bot = TG_Bot()
+    bot = Tg_Bot()
 
     while True:
         bot.start()

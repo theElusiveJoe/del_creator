@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Номер заказа?</title>
+{% endblock %}
+
+{% block body%}
+<div class="container">
+    <form role="form" action="/admin/login.html" method="POST" style="margin-top: 15%; margin-left: 30%;">
+        {% if not failed %}
+        <h5>Введите секретный ключ</h5>
+        {% else %}
+        <h5>Был введен неправильный ключ</h5>
+        {% endif %}
+        <input type="text" class="form-control" name="password" required style="width: 30%;">
+        <br>
+        <input type="submit" class="btn btn-primary" value="залогиниться">
+    </form>
+</div>
+{% endblock %}

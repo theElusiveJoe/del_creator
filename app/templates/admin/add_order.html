@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Добавляем закза</title>
+
+<!--<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey={{ymaps_token}}" type="text/javascript"></script>-->
+<!--<script type="text/javascript">-->
+<!--    ymaps.ready(init);-->
+<!--    function init() {-->
+<!--        var suggestView1 = new ymaps.SuggestView('fullname');-->
+<!--    }-->
+<!--</script>-->
+
+<!--<style>-->
+<!--#suggest1{-->
+<!--    width: 300px;-->
+<!--    margin: 5px;-->
+<!--}-->
+
+<!--.header {-->
+<!--    padding: 5px;-->
+<!--}-->
+<!--</style>-->
+{% endblock %}
+
+{% block body%}
+<h5>Введие номер заказа для создания или редактирования</h5>
+<form role="form" action="/admin/add_order.html" method="GET">
+        <div class=" form-group">
+                <label>номер заказа</label>
+                <input type="text" class="form-control" name="order_id" value="test2" required>
+        </div>
+        <input type="submit" class="btn btn-primary" value="подгрузить">
+</form>
+<hr>
+
+<hr>
+{% if not raw %}
+{% endif %}
+{% endblock %}

@@ -1,10 +1,9 @@
 import requests
 import json
-import time
 import phonenumbers
 import os
 import sys
-from ..geocoder.geocoder import address_to_coords
+from apis.geocoder.geocoder import address_to_coords
 import logging
 import time
 import sqlite3
@@ -14,7 +13,7 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 log.addHandler(handler)
 
-with open(os.path.join(sys.path[0], 'tokens.json'), 'r') as tf:
+with open(os.path.join(sys.path[0], 'tokens/tokens.json'), 'r') as tf:
     headers = {
         'Accept-Language': 'ru/ru',
         'Authorization': 'Bearer ' + json.load(tf)['yandex_go']

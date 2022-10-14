@@ -1,9 +1,8 @@
-import json
-from .yandex_go.yandex_go import yandex_get_cost
+from apis.yandex_go_user.yandex_go import yandex_get_cost
 # from .dostavista_api import dostavista_get_cost
 
 
-def count_delivery(addr, info_from_gsheets):
+def get_services_prices(addr, info_from_gsheets):
     """
     Принимает на вход строку с адресом
     Возвращает словарь {
