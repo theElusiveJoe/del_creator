@@ -18,12 +18,12 @@ def download_order_row(order_id):
         columns={'Число': 'date',
                  'Заказ': 'id',
                  'Номер счета': 'account_number',
-                 'Нал': 'cash',
+                 'Нал': 'cache',
                  'Безнал': 'emoney',
                  'Оплачено (число)': 'paid',
                  'Форма оплаты': 'payment_method',
                  'Время': 'payment_time',
-                 'Примечание': 'comments',
+                 'Примечание': 'comment',
                  'Вывоз': 'delivery_service',
                  'Письмо на склад': 'mail_on_warehouse',
                  'Доставка на': 'delivery_arranged_on',
@@ -32,10 +32,12 @@ def download_order_row(order_id):
                  'вес': 'weight',
                  'Списано со склада': 'decommisioned',
                  'Статус': 'status',
-                 'примечания': 'comments2',
+                 'примечания': 'comment2',
                  'warehouse': 'warehouse'})
     row = table[table['id'] == order_id].iloc[0].fillna('').to_dict()
     row['emoney'] = ''.join(filter(lambda x: ord(x) < 100, row['emoney'])).replace(' ', '')
+    row['cache'] = ''.join(filter(lambda x: ord(x) < 100, row['cache'])).replace(' ', '')
+    row['paid'] = row['paid'] == 'оплачено'
     log.info(row['emoney'])
     return row
 

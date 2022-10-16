@@ -50,7 +50,6 @@ def get_order_line_from_ghseets_for_yandex_user(order_id):
         raise Exception('Проблемы с гугл таблицей')
 
 def get_order_info_for_local_order(order_id):
-
     gsheets_info, shop_info = get_order_full_info(order_id)
 
     print(json.dumps(gsheets_info, indent=4, ensure_ascii=False))
@@ -60,15 +59,21 @@ def get_order_info_for_local_order(order_id):
 
     result['order_id'] = gsheets_info['id']
     result['pay_type'] = gsheets_info['payment_method']
-    result['cash'] = gsheets_info['cash']
-    result['emoney'] = int(gsheets_info['emoney'])
-    result['comment'] = gsheets_info['comments']
+    result['cache'] = gsheets_info['cache']
+    result['emoney'] = gsheets_info['emoney']
+    result['comment'] = gsheets_info['comment']
     result['paid'] = gsheets_info['paid']
 
     customer = shop_info['Customer']
     log.info(customer.get('Organisation'))
     result['name'] = ' '.join(map(str, (filter(None, [customer['FirstName'], customer['LastName'], customer.get('Organisation')]))))
     result['phone'] = customer['Phone']
+
+    result['fullname'] = ' '.join([customer['Region'], customer['District'], customer['City'],customer['Street'],customer['House'],customer['Structure'],customer['CustomField1'],]).strip()
+    result['del_comment'] = ''
+    result['del_comment'] += 'квартира/офис ' + customer['Apartment'].strip() if customer['Apartment'].strip() != '' else ''
+    result['del_comment'] += 'этаж ' + customer['Floor'].strip() if customer['Floor'].strip() != '' else ''
+    result['del_comment'] += 'подъезд/вход ' + customer['Entrance'].strip() if customer['Entrance'].strip() != '' else ''
 
     return result
 

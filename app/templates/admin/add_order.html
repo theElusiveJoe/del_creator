@@ -1,26 +1,33 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Добавляем закза</title>
+<title>Добавляем заказ</title>
 
-<!--<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey={{ymaps_token}}" type="text/javascript"></script>-->
-<!--<script type="text/javascript">-->
-<!--    ymaps.ready(init);-->
-<!--    function init() {-->
-<!--        var suggestView1 = new ymaps.SuggestView('fullname');-->
-<!--    }-->
-<!--</script>-->
+{% if not raw %}
+<!--bootstrap-->
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap-switch-button@1.1.0/css/bootstrap-switch-button.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap-switch-button@1.1.0/dist/bootstrap-switch-button.min.js"></script>
 
-<!--<style>-->
-<!--#suggest1{-->
-<!--    width: 300px;-->
-<!--    margin: 5px;-->
-<!--}-->
+<!--ymaps geocoder-->
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey={{ymaps_token}}" type="text/javascript"></script>
+<script type="text/javascript">
+    ymaps.ready(init);
+    function init() {
+        var suggestView1 = new ymaps.SuggestView('fullname');
+    }
+</script>
+{% endif %}
 
-<!--.header {-->
-<!--    padding: 5px;-->
-<!--}-->
-<!--</style>-->
+<style>
+#suggest1{
+    width: 300px;
+    margin: 5px;
+}
+
+.header {
+    padding: 5px;
+}
+</style>
 {% endblock %}
 
 {% block body%}
@@ -28,13 +35,84 @@
 <form role="form" action="/admin/add_order.html" method="GET">
         <div class=" form-group">
                 <label>номер заказа</label>
-                <input type="text" class="form-control" name="order_id" value="test2" required>
+                <input type="text" class="form-control" name="order_id" value="Y-21844" required>
         </div>
         <input type="submit" class="btn btn-primary" value="подгрузить">
 </form>
-<hr>
 
-<hr>
 {% if not raw %}
+<hr>
+<div class="modal-body row">
+        <div class="col-md-6">
+                <form role="form" action="/admin/add_order.html" method="POST">
+
+                        <div class="form-group w-50">
+                                <label>id заказа</label>
+                                <input type="text" class="form-control" name="order_id" value="{{primary_info['order_id']}}" required>
+                        </div>
+
+                        <div class="form-group w-50">
+                                <label>комментарий к заказу</label>
+                                <input type="text" class="form-control" name="comment" value="{{primary_info['comment']}}">
+                        </div>
+
+
+                        <div class="form-group w-50">
+                                <label>имя клиента</label>
+                                <input type="text" class="form-control" name="name" value="{{primary_info['name']}}" required>
+                        </div>
+
+                        <div class="form-group w-50">
+                                <label>телефон клиента</label>
+                                <input type="text" class="form-control" name="phone" value="{{primary_info['phone']}}" required>
+                        </div>
+
+                        <div class="form-group w-50">
+                                <label>курьер берет деньги с клиента</label> <br>
+                                <input type="text" class="form-control" name="price" value="{{primary_info['emoney'] + primary_info['cache']}}" >
+                                <input type="checkbox" class="form-control form-check-input" data-toggle="switchbutton" name="paid"
+                                       data-offlabel="берет"
+                                       data-onlabel="не_берет"
+                                       value="1"
+                                {% if primary_info['paid'] %} checked {% endif %} >
+                                <!-- hidden должен стоять ниже checkbox'a!!!!!-->
+                                <input type="hidden" value="0" name="paid">
+                        </div>
+
+                        <div class="form-group w-50">
+                                <label>адрес вместе с городом</label>
+                                <input type="text" class="form-control" name="fullname" id="fullname" value="{{primary_info['fullname']}}" required>
+                        </div>
+
+                        <div class="form-group w-50">
+                                <label>Комментарий курьеру</label>
+                                <input type="text" class="form-control" name="del_comment" value="{{primary_info['del_comment']}}">
+                        </div>
+
+                        <input type="submit" class="btn btn-primary" value="добавить заказик">
+                </form>
+                <hr>
+        </div>
+
+        <div class="col-md-6">
+                {{ primary_info['comments'] }}
+
+                <br><br>
+
+                <label><b>Деньги</b></label><br>
+                <label>{{ primary_info['cache'] }}</label><label>{{ primary_info['emoney'] }}</label><br>
+                <label>{{ primary_info['paid'] }}</label><br>
+
+                <br>
+
+                <label>{{ primary_info['comments'] }}</label>
+        </div>
+</div>
+
+
+
+
 {% endif %}
+
+
 {% endblock %}
