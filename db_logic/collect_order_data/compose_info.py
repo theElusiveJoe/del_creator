@@ -75,7 +75,7 @@ def get_order_info_for_local_order(order_id):
     result['del_comment'] += 'этаж ' + customer['Floor'].strip() if customer['Floor'].strip() != '' else ''
     result['del_comment'] += 'подъезд/вход ' + customer['Entrance'].strip() if customer['Entrance'].strip() != '' else ''
 
-    return result
+    return result, order_id, gsheets_info, shop_info,
 
 
 

@@ -10,7 +10,7 @@ def address_to_coords(address, results_max_num=1):
     headers = {
         'apikey': geocoder_token,
         'geocode': address,
-        'format' : 'json',
+        'format': 'json',
         'results': results_max_num
     }
 

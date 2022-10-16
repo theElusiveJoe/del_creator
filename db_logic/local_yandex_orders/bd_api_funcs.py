@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine, inspect
 from sqlalchemy import Table, Column, Integer, String, MetaData, Date, Numeric, Boolean
-from sqlalchemy import insert, update, delete
 
-DBFILEPATH = 'sqlite:///{db.db}'
+from apis.geocoder.geocoder import address_to_coords
+
+DBFILEPATH = 'sqlite:///db.db'
 
 # def create_engine_and_meta():
 engine = create_engine(DBFILEPATH, echo=True)
@@ -23,8 +24,10 @@ orders = Table(
     # данные заказа
     Column('order_id', String, primary_key=True),
     Column('paid', Boolean),
-    Column('price', Numeric),
+    Column('price', String),
     Column('comment', String),
+    Column('warehouse', String),
+    Column('registered', Boolean),
 
     # данные пользователя
     Column('name', String),
@@ -32,28 +35,47 @@ orders = Table(
 
     # данные адреса
     Column('fullname', String),
+    Column('lat', String),
+    Column('long', String),
     Column('del_comment', String),
 )
 
 meta.create_all(engine)
 
 
-def add_order(form):
-    # create_table()
-
-    # engine, _ = create_engine_and_meta()
+def add_order(form, gsheets):
     with engine.connect() as conn:
         stmt1 = orders.delete().where(orders.c.order_id == form['order_id'])
         conn.execute(stmt1)
+
+        long, lat = address_to_coords(form['fullname'])
+
         stmt2 = orders.insert().values(
             order_id=form['order_id'],
+
             paid=bool(form['paid']),
-            price=float(form['price']),
+            price=form['price'],
             comment=form['comment'],
+
             name=form['name'],
             phone=form['phone'],
+
             fullname=form['fullname'],
             del_comment=form['del_comment'],
+            lat=str(lat),
+            long=str(long),
+
+            registered=False,
+            warehouse=gsheets['warehouse']
+
         )
         result = conn.execute(stmt2)
 
+
+def get_orders():
+    with engine.connect() as conn:
+        stmt = orders.select()
+        result = conn.execute(stmt)
+        # for row in result:
+        #     print(row._mapping)
+        return list(map(lambda x: x._asdict(), result))
