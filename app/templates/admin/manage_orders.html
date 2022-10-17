@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'admin/base.html' %}
 
 {% block head %}
 <title>Распределяем заказы</title>
@@ -16,17 +16,6 @@
   type="text/javascript">
 </script>
 
-<script type="text/javascript">
-        var map_obj;
-        ymaps.ready(function(){
-            map_obj = new ymaps.Map("map", {
-                center: [55.76, 37.64],
-                zoom: 10
-            });
-        });
-  </script>
-
-
 {% endif %}
 
 <style>
@@ -42,17 +31,26 @@
 {% endblock %}
 
 {% block body%}
-<h1>ЗАКАЗЫ</h1>
 <div class="modal-body row">
         <div class="col-md-6">
             <div id="map" style="width:500px; height:500px"></div>
         </div>
 
-        <div class="col-md-6">
-            <ul id="order_list">
-
-            </ul>
-            <button id="get_orders_btn" >Получить заказы</button>
+    <div class="col-md-6">
+        <button id="get_orders_btn" class="btn btn-primary">Получить заказы</button>
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>кл</th>
+                    <th>order_id</th>
+                    <th>время</th>
+                    <th>вес</th>
+                    <th>мест</th>
+                    <th>комментарий</th>
+                </tr>
+            </thead>
+            <tbody id="orders_list"></tbody>
+          </table>
         </div>
 </div>
 <script src="/static/js/orders_manager_ymaps.js"></script>

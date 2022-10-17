@@ -13,6 +13,11 @@ with open('tokens/tokens.json', 'r') as tf:
 
 
 def download_order_row(order_id):
+    def to_int(rawstr):
+        print('CONVERTING', rawstr)
+        res = ''.join(filter(lambda x: ord(x) < 100, rawstr)).replace(' ', '')
+        print('CONVERTED', res)
+        return res
     log.info(f'GSHEETS get_line "{order_id}"')
     table = pd.read_csv(csv_link, header=1, usecols=[x for x in range(19)]).rename(
         columns={'Число': 'date',
@@ -22,7 +27,7 @@ def download_order_row(order_id):
                  'Безнал': 'emoney',
                  'Оплачено (число)': 'paid',
                  'Форма оплаты': 'payment_method',
-                 'Время': 'payment_time',
+                 'Время': 'del_time_interval',
                  'Примечание': 'comment',
                  'Вывоз': 'delivery_service',
                  'Письмо на склад': 'mail_on_warehouse',
@@ -35,13 +40,13 @@ def download_order_row(order_id):
                  'примечания': 'comment2',
                  'warehouse': 'warehouse'})
     row = table[table['id'] == order_id].iloc[0].fillna('').to_dict()
-    row['emoney'] = ''.join(filter(lambda x: ord(x) < 100, row['emoney'])).replace(' ', '')
-    row['cache'] = ''.join(filter(lambda x: ord(x) < 100, row['cache'])).replace(' ', '')
+
+    row['emoney'] = to_int(row['emoney'])
+    row['cache'] = to_int(row['cache'])
     row['paid'] = row['paid'] == 'оплачено'
-    log.info(row['emoney'])
+    row['positions'] = to_int(row['positions']) if len(row['positions']) > 0 else '0'
+
     return row
-
-
 
 
 def get_order_line_from_ghseets(order_id):

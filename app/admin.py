@@ -56,7 +56,8 @@ def add_order_raw():
     if request.method == 'POST':
         print(json.dumps(dict(request.form), ensure_ascii=False, indent=4))
         request_order_id = request.form['order_id']
-        if 'last_order_id' in request.form.keys() and request_order_id == session['last_order_id']:
+        if 'last_order_id' in session.keys() and request_order_id == session['last_order_id']:
+            print('CACHING WORKED')
             add_order_to_local_db(form=request.form, gsheets=session['last_order_gsheets_info'])
         else:
             add_order_to_local_db(form=request.form, gsheets=get_order_line_from_ghseets(request_order_id))

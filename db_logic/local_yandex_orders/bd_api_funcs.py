@@ -26,8 +26,14 @@ orders = Table(
     Column('paid', Boolean),
     Column('price', String),
     Column('comment', String),
-    Column('warehouse', String),
+
+    Column('weight', String),
+    Column('positions', Integer),
+    Column('size', String),
+    Column('del_time_interval', String),
+
     Column('registered', Boolean),
+    Column('cluster', String),
 
     # данные пользователя
     Column('name', String),
@@ -49,7 +55,7 @@ def add_order(form, gsheets):
         conn.execute(stmt1)
 
         long, lat = address_to_coords(form['fullname'])
-
+        print('POOOOOOS', gsheets['positions'])
         stmt2 = orders.insert().values(
             order_id=form['order_id'],
 
@@ -66,8 +72,11 @@ def add_order(form, gsheets):
             long=str(long),
 
             registered=False,
-            warehouse=gsheets['warehouse']
-
+            cluster='0',
+            weight=str(gsheets['weight']),
+            positions=int(gsheets['positions']),
+            size=gsheets['size'],
+            del_time_interval=gsheets['del_time_interval']
         )
         result = conn.execute(stmt2)
 
