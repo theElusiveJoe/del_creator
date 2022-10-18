@@ -1,22 +1,14 @@
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine, inspect, update
 from sqlalchemy import Table, Column, Integer, String, MetaData, Date, Numeric, Boolean
 
 from apis.geocoder.geocoder import address_to_coords
 
+
 DBFILEPATH = 'sqlite:///db.db'
 
-# def create_engine_and_meta():
 engine = create_engine(DBFILEPATH, echo=True)
 meta = MetaData()
-# return engine, meta
 
-# def create_table():
-    # global orders
-    # engine, meta = create_engine_and_meta()
-    # if inspect(engine).has_table('orders'):
-    #     print('table already exists')
-    #     return
-    # print('creating')
 
 orders = Table(
     'orders', meta,
@@ -88,3 +80,14 @@ def get_orders():
         # for row in result:
         #     print(row._mapping)
         return list(map(lambda x: x._asdict(), result))
+
+
+def upd_cluster(orders_ids, new_cluster_num):
+    with engine.connect() as conn:
+        for order_id in orders_ids:
+            stmt = (
+                update(orders).
+                where(orders.c.order_id == order_id).
+                values(cluster = new_cluster_num)
+            )
+            conn.execute(stmt)

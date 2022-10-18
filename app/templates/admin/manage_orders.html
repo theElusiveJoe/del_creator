@@ -3,11 +3,6 @@
 {% block head %}
 <title>Распределяем заказы</title>
 
-{% if not raw %}
-<!--bootstrap-->
-<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap-switch-button@1.1.0/css/bootstrap-switch-button.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap-switch-button@1.1.0/dist/bootstrap-switch-button.min.js"></script>
-
 <!--jquery-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -16,28 +11,16 @@
   type="text/javascript">
 </script>
 
-{% endif %}
 
-<style>
-#suggest1{
-    width: 300px;
-    margin: 5px;
-}
-
-.header {
-    padding: 5px;
-}
-</style>
 {% endblock %}
 
 {% block body%}
 <div class="modal-body row">
-        <div class="col-md-6">
-            <div id="map" style="width:500px; height:500px"></div>
-        </div>
+    <div class="col-md-6">
+        <div id="map" style="width:500px; height:500px"></div>
+    </div>
 
     <div class="col-md-6">
-        <button id="get_orders_btn" class="btn btn-primary">Получить заказы</button>
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -50,13 +33,12 @@
                 </tr>
             </thead>
             <tbody id="orders_list"></tbody>
-          </table>
-        </div>
+        </table>
+        <button id="drop_claster_button" class="btn btn-primary">drop cluster</button>
+        <button id="new_claster_button" class="btn btn-primary">new cluster</button>
+        <button id="upd_claster_button" class="btn btn-primary">move to cluster</button>
+    </div>
 </div>
+
 <script src="/static/js/orders_manager_ymaps.js"></script>
-{% if not raw %}
-
-{% endif %}
-
-
 {% endblock %}
