@@ -25,40 +25,39 @@ with open(os.path.join(sys.path[0], 'tokens/tokens.json'), 'r') as tokens:
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
-
-# @bp.route('/admin_panel.html')
+@bp.route('/')
+@bp.route('/admin_panel.html')
 @bp.route('/login.html', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
-        return render_template('admin/admin_panel.html')
+        return render_template('/admin/admin_panel.html')
 
     if request.method == 'GET':
-        return render_template('admin/login.html')
+        return render_template('/admin/login.html')
 
     if hashlib.md5(request.form['password'].encode()).hexdigest() == password:
         session['logged_in'] = True
-        return render_template('admin/manage_orders.html')
+        return render_template('/admin/manage_orders.html')
     else:
-        return render_template('admin/login.html', failed=True)
+        return render_template('/admin/login.html', failed=True)
 
 
 @bp.route('/add_order.html', methods=['GET', 'POST'])
 def add_order_raw():
-    if not session.get('logged_in'):
-        return render_template('/admin/login.html')
+    # if not session.get('logged_in'):
+    #     return render_template('/admin/login.html')
 
     if request.method == 'GET':
         if not request.args.get('order_id'):
-            return render_template('admin/add_order.html', raw=True)
+            return render_template('/admin/add_order.html', raw=True)
 
         primary_info, session['last_order_id'], session['last_order_gsheets_info'], session['last_order_shop_info'] = get_order_info_for_local_order(
             request.args.get('order_id').strip())
         log.info(primary_info)
 
-        return render_template('admin/add_order.html', raw=False, primary_info=primary_info, ymaps_token=ymaps_token)
+        return render_template('/admin/add_order.html', raw=False, primary_info=primary_info, ymaps_token=ymaps_token)
 
     if request.method == 'POST':
-        print(json.dumps(dict(request.form), ensure_ascii=False, indent=4))
         request_order_id = request.form['order_id']
         if 'last_order_id' in session.keys() and request_order_id == session['last_order_id']:
             print('CACHING WORKED')
@@ -68,29 +67,56 @@ def add_order_raw():
             add_order_to_local_db(
                 form=request.form, gsheets=get_order_line_from_ghseets(request_order_id))
 
-        return render_template('admin/add_order.html', raw=True)
+        return render_template('/admin/add_order.html', raw=True)
 
 
 @bp.route('/manage_orders.html', methods=['GET', 'POST'])
 def manage_orders():
-    if not session.get('logged_in'):
-        return render_template('/admin/login.html')
+    # if not session.get('logged_in'):
+    #     return render_template('/admin/login.html')
 
     if request.method == 'GET':
-        return render_template('admin/manage_orders.html', ymaps_token=ymaps_token)
+        return render_template('/admin/manage_orders.html', ymaps_token=ymaps_token)
+
+
+@bp.route('/manage_cluster.html', methods=['GET', 'POST'])
+def manage_clusters():
+    # if not session.get('logged_in'):
+        # return render_template('/admin/login.html')
+
+    if request.method == 'GET':
+        return render_template('/admin/manage_clusters.html', ymaps_token=ymaps_token)
 
 
 @bp.route('/get_orders', methods=['GET'])
 def get_orders():
-    if not session.get('logged_in'):
-        return redirect('/admin/login.html')
+    # if not session.get('logged_in'):
+    #     return redirect('/admin/login.html')
 
     orders = get_orders_from_local_db()
+    cl_num = request.args.get('cluster_num')
+    if cl_num:
+        print('FILTERS CLUSTER', cl_num, type(cl_num))
+        print(orders)
+        for x in orders:
+            print(x['cluster'], cl_num, x['cluster'] == cl_num)
+        orders = list(filter(lambda x: x['cluster'] == cl_num, orders))
     return json.dumps({'orders': orders}, ensure_ascii=False)
+
+
+@bp.route('/get_clusters_nums', methods=['GET'])
+def get_clusters_nums():
+    # if not session.get('logged_in'):
+    #     return redirect('/admin/login.html')
+
+    orders = get_orders_from_local_db()
+    clusters_nums = list(set(map(lambda x: x['cluster'], orders)))
+    return json.dumps({'clusters_nums': clusters_nums}, ensure_ascii=False)
 
 
 @bp.route('/update_cluster', methods=['POST'])
 def upd_cluster():
     request.json
-    upd_cluster_in_local_db(request.json['orders_ids'], request.json['new_cluster_num'])
+    upd_cluster_in_local_db(
+        request.json['orders_ids'], request.json['new_cluster_num'])
     return 'lol'

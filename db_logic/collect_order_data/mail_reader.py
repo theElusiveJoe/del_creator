@@ -52,7 +52,7 @@ def get_order_from_mail(order_raw_num):
 
     try:
         # парсим json шаблон
-        ftempl = open('compose_data/zippack_patterm.json', 'r')
+        # ftempl = open('compose_data/zippack_patterm.json', 'r')
         the_json = copy.copy(the_json_main)
         obj = the_json['obj']
 
@@ -158,8 +158,7 @@ def get_order_from_mail(order_raw_num):
         # logging.error('Возникли проблемы при парсинге письма')
     the_json['obj'] = obj
 
-    return json.dumps(the_json, ensure_ascii=False)
-
+    return the_json
 
 if __name__ == '__main__':
     f = open('smth.json', 'w')

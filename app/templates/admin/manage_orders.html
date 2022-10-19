@@ -7,8 +7,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 <!--ymaps init-->
-<script src="https://api-maps.yandex.ru/2.1/?apikey={{ymaps_token}}&lang=ru_RU"
-  type="text/javascript">
+<script src="https://api-maps.yandex.ru/2.1/?apikey={{ymaps_token}}&lang=ru_RU" type="text/javascript">
 </script>
 
 
@@ -34,11 +33,21 @@
             </thead>
             <tbody id="orders_list"></tbody>
         </table>
-        <button id="drop_claster_button" class="btn btn-primary">drop cluster</button>
-        <button id="new_claster_button" class="btn btn-primary">new cluster</button>
-        <button id="upd_claster_button" class="btn btn-primary">move to cluster</button>
+        <div style="display:inline-block;">
+            <button id="drop_claster_button" class="btn btn-primary">drop cluster</button>
+            <button id="new_claster_button" class="btn btn-primary">new cluster</button>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    mov cluster
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="dropdown_cluster_variants">
+                </ul>
+                
+            </div>
+        </div>
+        <!-- <button id="upd_claster_button" class="btn btn-primary">move to cluster</button> -->
     </div>
-</div>
 
-<script src="/static/js/orders_manager_ymaps.js"></script>
-{% endblock %}
+    <script src="/static/js/orders_manager_ymaps.js"></script>
+    {% endblock %}

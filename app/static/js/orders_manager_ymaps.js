@@ -6,7 +6,7 @@ var cluster_color_mapping = {
     // для нулевого кластера
     0: 'islands#grayStretchyIcon',
     // для выделенных
-    15: 'islands#redStretchyIcon',
+    'selected': 'islands#redStretchyIcon',
     // популярные
     1: 'islands#blueStretchyIcon',
     2: 'islands#darkGreenStretchyIcon',
@@ -27,7 +27,7 @@ var cluster_color_mapping = {
 
 
 function click_on_order(order_id) {
-    var tr = document.querySelector("#" + order_id)
+    var tr = document.querySelector("#order" + order_id)
     for (var i = 0; i < points.length; i++) {
         if (points[i].properties._data.order_id == order_id) {
             var point = points[i]
@@ -35,11 +35,11 @@ function click_on_order(order_id) {
         }
     }
     if (point.properties._data.selected) {
-        point.options.set("preset", "islands#blackStretchyIcon")
+        point.options.set("preset", cluster_color_mapping[point.properties._data.cluster])
         tr.className = ""
         point.properties._data.selected = false
     } else {
-        point.options.set("preset", "islands#blueStretchyIcon")
+        point.options.set("preset", cluster_color_mapping['selected'])
         tr.className = "table-primary"
         point.properties._data.selected = true
     }
@@ -62,12 +62,13 @@ function load_orders() {
             var orders = JSON.parse(result)['orders']
             
             clusters = [],
-            points = []
+            points = [],
+            document.querySelector("#dropdown_cluster_variants").innerHTML = ""
             // для каждого заказа:
             for (const order of orders) {
                 // создаем строчку
                 var tr = document.createElement("tr")
-                tr.id = order["order_id"]
+                tr.id = 'order'+order["order_id"]
                 $("<td>").html(order["cluster"]).appendTo(tr)
                 $("<td>").html(order["order_id"]).appendTo(tr)
                 $("<td>").html(order["del_time_interval"]).appendTo(tr)
@@ -90,7 +91,7 @@ function load_orders() {
                         cluster: order['cluster']
                     }
                 }, {
-                    preset: 'islands#blackStretchyIcon',
+                    preset: cluster_color_mapping[order['cluster']],
                 })
 
                 // событие клика по точке
@@ -106,10 +107,26 @@ function load_orders() {
                 // добавляем точку на карту
                 map_obj.geoObjects.add(new_point)
             }
+
             clusters =  [...new Set(clusters)]
             clusters.sort()
             console.log('Clusters:', clusters)
             console.log('Points:', points)
+            for(const cl_num in clusters){
+                var b = document.createElement("button")
+                b.innerHTML = clusters[cl_num]
+                b.style = "width: 180px"
+                b.classList.add("btn")
+                b.classList.add("btn-secondary")
+                console.log("NEW CLUSTER BUTTON:", clusters[cl_num])
+                b.onclick = function (){
+                    set_new_cluster(collect_selected_ids(), clusters[cl_num])
+                    load_orders()
+                }
+                var l = document.createElement("li")
+                l.appendChild(b)
+                document.querySelector("#dropdown_cluster_variants").appendChild(l)
+            }
         }
     });
 }
@@ -139,6 +156,9 @@ function set_new_cluster(selected_ids, new_cluster_num) {
     });
 }
 
+$('.dropdown').hover(function(){ 
+    $('.dropdown-toggle', this).trigger('click'); 
+  });
 
 $("#drop_claster_button").click(function () {
     set_new_cluster(collect_selected_ids(), 0)
