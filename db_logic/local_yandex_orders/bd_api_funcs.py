@@ -26,6 +26,7 @@ orders = Table(
 
     Column('registered', Boolean),
     Column('cluster', String),
+    Column('seq_num', Integer),
 
     # данные пользователя
     Column('name', String),
@@ -91,3 +92,20 @@ def upd_cluster(orders_ids, new_cluster_num):
                 values(cluster = new_cluster_num)
             )
             conn.execute(stmt)
+
+
+def upd_cluster_orders_order(orders_ids):
+    with engine.connect() as conn:
+        for i, order_id in enumerate(orders_ids):
+            stmt = (
+                update(orders).
+                where(orders.c.order_id == order_id).
+                values(seq_num = i+2)
+            )
+            conn.execute(stmt)
+
+def get_order_by_id(order_id):
+     with engine.connect() as conn:
+        stmt = orders.select().where(orders.c.order_id == order_id)
+        result = conn.execute(stmt)
+        return result._asdict()

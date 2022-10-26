@@ -142,4 +142,25 @@ function create_route_on_map(ev, ui) {
 }
 
 
+$("#yandex_btn").click(
+    function(){
+        var rows = document.getElementsByTagName("tbody")[0].getElementsByTagName("tr")
+        var orders = []
+        console.log(rows)
+        for (var i = 0; i < rows.length; i++){
+            orders.push(rows[i].firstChild.innerHTML)
+        }
+        if (orders.length > 0){
+            $.ajax({
+                type: "POST",
+                url: "/admin/register_cluster_in_yandex",
+                data: JSON.stringify({
+                    orders_ids: orders
+                }),
+                contentType: "application/json"
+            });
+        }
+    }
+)
+
 load_clusters_nums()

@@ -5,6 +5,7 @@ from db_logic.collect_order_data.compose_info import get_order_line_from_ghseets
 from db_logic.local_yandex_orders.bd_api_funcs import add_order as add_order_to_local_db
 from db_logic.local_yandex_orders.bd_api_funcs import get_orders as get_orders_from_local_db
 from db_logic.local_yandex_orders.bd_api_funcs import upd_cluster as upd_cluster_in_local_db
+from db_logic.local_yandex_orders.bd_api_funcs import upd_cluster_orders_order as upd_cluster_orders_order 
 import logging
 import sys
 import json
@@ -116,7 +117,13 @@ def get_clusters_nums():
 
 @bp.route('/update_cluster', methods=['POST'])
 def upd_cluster():
-    request.json
     upd_cluster_in_local_db(
         request.json['orders_ids'], request.json['new_cluster_num'])
-    return 'lol'
+    return 0
+
+@bp.route('/register_cluster_in_yandex', methods=['POST'])
+def register_cluster_in_yandex():
+    upd_cluster_orders_order(
+        request.json['orders_ids']
+    )
+    return 0
