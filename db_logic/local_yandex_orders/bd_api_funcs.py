@@ -66,7 +66,7 @@ def add_order(form, gsheets):
 
             registered=False,
             cluster='0',
-            weight=str(gsheets['weight']),
+            weight=str(gsheets['weight']).replace(',', '.'),
             positions=int(gsheets['positions']),
             size=gsheets['size'],
             del_time_interval=gsheets['del_time_interval']
@@ -83,7 +83,7 @@ def get_orders():
         return list(map(lambda x: x._asdict(), result))
 
 
-def upd_cluster(orders_ids, new_cluster_num):
+def upd_cluster_num(orders_ids, new_cluster_num):
     with engine.connect() as conn:
         for order_id in orders_ids:
             stmt = (
@@ -94,8 +94,9 @@ def upd_cluster(orders_ids, new_cluster_num):
             conn.execute(stmt)
 
 
-def upd_cluster_orders_order(orders_ids):
+def upd_cluster_seq(orders_ids):
     with engine.connect() as conn:
+        print('ОБНОВЛЯЮ ПОРЯДОК В КЛАСТЕРЕ')
         for i, order_id in enumerate(orders_ids):
             stmt = (
                 update(orders).
@@ -107,5 +108,6 @@ def upd_cluster_orders_order(orders_ids):
 def get_order_by_id(order_id):
      with engine.connect() as conn:
         stmt = orders.select().where(orders.c.order_id == order_id)
-        result = conn.execute(stmt)
+        result = conn.execute(stmt).fetchone()
+        print(result)
         return result._asdict()

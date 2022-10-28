@@ -14,6 +14,8 @@ with open('tokens/tokens.json', 'r') as tf:
 
 def download_order_row(order_id):
     def to_int(rawstr):
+        if not rawstr:
+            return 0
         print('CONVERTING', rawstr)
         res = ''.join(filter(lambda x: ord(x) < 100, rawstr)).replace(' ', '')
         print('CONVERTED', res)
@@ -40,7 +42,6 @@ def download_order_row(order_id):
                  'примечания': 'comment2',
                  'warehouse': 'warehouse'})
     row = table[table['id'] == order_id].iloc[0].fillna('').to_dict()
-
     row['emoney'] = to_int(row['emoney'])
     row['cache'] = to_int(row['cache'])
     row['paid'] = row['paid'] == 'оплачено'

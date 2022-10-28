@@ -166,13 +166,13 @@ $("#drop_claster_button").click(function () {
 })
 
 $("#new_claster_button").click(function () {
-    var i = 1;
-    for (; i < clusters.length; i++) {
-        if (clusters[i] - clusters[i - 1] > 1) {
+    var i;
+    for (i = 1; i < 14; i++){
+        if (! clusters.includes(i)){
             break
         }
     }
-    set_new_cluster(collect_selected_ids(), clusters[i - 1]+1);
+    set_new_cluster(collect_selected_ids(), i);
     load_orders()
 });
 
