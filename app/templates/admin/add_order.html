@@ -31,7 +31,7 @@
 <form role="form" action="/admin/add_order.html" method="GET">
         <div class=" form-group">
                 <label>номер заказа</label>
-                <input type="text" class="form-control" name="order_id" value="Y-21844" required>
+                <input type="text" class="form-control" name="order_id" required>
         </div>
         <input type="submit" class="btn btn-primary" value="подгрузить">
 </form>
@@ -62,17 +62,21 @@
                                 <label>телефон клиента</label>
                                 <input type="text" class="form-control" name="phone" value="{{primary_info['phone']}}" required>
                         </div>
-
+                        
                         <div class="form-group w-50">
-                                <label>курьер берет деньги с клиента</label> <br>
+                                <label>объявленная стоимость заказа</label>
                                 <input type="text" class="form-control" name="price" value="{{primary_info['emoney'] + primary_info['cache']}}" >
-                                <input type="checkbox" class="form-control form-check-input" data-toggle="switchbutton" name="paid"
-                                       data-offlabel="берет"
-                                       data-onlabel="не_берет"
-                                       value="1"
-                                {% if primary_info['paid'] %} checked {% endif %} >
-                                <!-- hidden должен стоять ниже checkbox'a!!!!!-->
-                                <input type="hidden" value="0" name="paid">
+                        </div>
+
+                        <div class="form-group w-50" style="display: inline-block;">
+                                
+                                <input type="hidden" value="0" name="paid" checked>
+                                <input type="checkbox" role='switch' class="form-check-input" data-toggle="switchbutton" name="paid"
+                                data-offlabel="берет"
+                                data-onlabel="не_берет"
+                                value="1" 
+                                {% if  not primary_info['paid'] %} checked {% endif %}>
+                                <label>курьер берет деньги с клиента</label> <br>
                         </div>
 
                         <div class="form-group w-50">
@@ -102,6 +106,7 @@
                 <br>
 
                 <label>{{ primary_info['comments'] }}</label>
+                {% if err_msg%}<h4>{{err_msg}}</h4> {% endif %}
         </div>
 </div>
 

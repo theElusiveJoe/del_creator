@@ -48,11 +48,11 @@ def add_order(form, gsheets):
         conn.execute(stmt1)
 
         long, lat = address_to_coords(form['fullname'])
-        print('POOOOOOS', gsheets['positions'])
+        print('FORM:', form)
         stmt2 = orders.insert().values(
             order_id=form['order_id'],
 
-            paid=bool(form['paid']),
+            paid=bool(int(form['paid'])),
             price=form['price'],
             comment=form['comment'],
 
@@ -89,25 +89,35 @@ def upd_cluster_num(orders_ids, new_cluster_num):
             stmt = (
                 update(orders).
                 where(orders.c.order_id == order_id).
-                values(cluster = new_cluster_num)
+                values(cluster=new_cluster_num)
             )
             conn.execute(stmt)
 
 
 def upd_cluster_seq(orders_ids):
     with engine.connect() as conn:
-        print('ОБНОВЛЯЮ ПОРЯДОК В КЛАСТЕРЕ')
         for i, order_id in enumerate(orders_ids):
             stmt = (
                 update(orders).
                 where(orders.c.order_id == order_id).
-                values(seq_num = i+2)
+                values(seq_num=i+2)
             )
             conn.execute(stmt)
 
+
 def get_order_by_id(order_id):
-     with engine.connect() as conn:
+    with engine.connect() as conn:
         stmt = orders.select().where(orders.c.order_id == order_id)
         result = conn.execute(stmt).fetchone()
         print(result)
         return result._asdict()
+
+
+def drop_cluster(orders_ids):
+    with engine.connect() as conn:
+        for i, order_id in enumerate(orders_ids):
+            stmt = (
+                delete(orders).
+                where(orders.c.order_id == order_id)
+            )
+            conn.execute(stmt)

@@ -18,22 +18,21 @@
 {% block body%}
 
 <div class="modal-body row">
-    <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-            aria-expanded="false">
-            выбрать кластер
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="dropdown_cluster_variants">
-        </ul>
-
-    </div>
+   
 
     <div class="col-md-6">
         <div id="map" style="width:500px; height:500px"></div>
     </div>
 
     <div class="col-md-6">
-
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                выбрать кластер
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="dropdown_cluster_variants">
+            </ul>
+        </div>
         <table class="table table-condensed">
             <thead>
                 <tr>
@@ -46,10 +45,11 @@
             </thead>
             <tbody id="orders_list"></tbody>
         </table>
-
+        
 
         <button class="btn btn-primary" id="yandex_btn">оформить в яндекс</button>
         <button class="btn btn-primary" id="local_order_btn">оформить в файлик</button>
+        <h5 id="msg"></h5>
 
     </div>
 </div>

@@ -29,7 +29,7 @@ var cluster_color_mapping = {
 function load_orders(cl_num) {
     console.log('LOADING CLUSTER', cl_num)
     //    обновляем карту
-    // document.querySelector("#orders_list").innerHTML = ''
+    document.querySelector("#orders_list").innerHTML = ''
     if (!!map_obj) {
         map_obj.destroy()
     }
@@ -48,7 +48,6 @@ function load_orders(cl_num) {
 
             clusters = []
             points = []
-            
 
             // для каждого заказа:
             for (const order of orders) {
@@ -101,7 +100,7 @@ function load_clusters_nums() {
     $.get({
         url: "/admin/get_clusters_nums",
         success: function (result) {
-            clusters = JSON.parse(result)["clusters_nums"]
+            var clusters = JSON.parse(result)["clusters_nums"]
             for (const i in clusters) {
                 var b = document.createElement("button")
                 b.innerHTML = clusters[i]
@@ -157,7 +156,18 @@ $("#yandex_btn").click(
                 data: JSON.stringify({
                     orders_ids: orders
                 }),
-                contentType: "application/json"
+                contentType: "application/json",
+                success: function(result){
+                    var resp = JSON.parse(result)
+                    console.log(resp)
+                    // var msg = resp['message']
+                    if (resp.code != 200){
+                        document.getElementById('msg').innerHTML = resp['message']
+                    } else {
+                        load_orders()
+                        document.getElementById('msg').innerHTML = 'Кластер обработан корректно'
+                    }
+                }
             });
         }
     }

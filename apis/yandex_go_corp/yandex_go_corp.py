@@ -2,6 +2,7 @@ import json
 import phonenumbers
 import uuid
 import requests
+import time
 
 
 from db_logic.local_yandex_orders.bd_api_funcs import get_order_by_id as get_order_from_local_db
@@ -16,6 +17,48 @@ with open('tokens/tokens.json', 'r') as tf:
         'Accept-Language': 'ru/ru',
         'Authorization': 'Bearer ' + json.load(tf)['yandex_go']
     }
+
+
+def get_smth(claim_id, smth=None):
+    query_params = {
+        'claim_id': claim_id
+    }
+
+    resp = requests.post(
+        f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v2/claims/info', headers=headers, params=query_params)
+
+    cont = json.loads(str(resp.content, encoding='utf-8'))
+
+    # if resp.status_code != 200:
+    #     logging.critical(
+    #         f'\nИнформация по заявке{claim_id},\nкод ответа: {resp.status_code}\nрассшифровка: {cont["message"]}')
+
+    return cont[smth], cont['version']
+
+
+def approve(claim_id, version):
+    query_params = {
+        'claim_id': claim_id
+    }
+    to_post = {
+        'version': version
+    }
+    resp = requests.post(
+        f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v2/claims/accept', headers=headers, params=query_params, data=json.dumps(to_post))
+
+    if resp.status_code == 200:
+        return 200, 'all ok'
+
+    cont = json.loads(str(resp.content, encoding='utf-8'))
+    return resp.status_code, cont['message']
+
+
+def get_status_after_estimating(claim_id):
+    status, version = get_smth(claim_id, 'status')
+    while status == 'estimating' or status == 'new':
+        time.sleep(1)
+        status, version = get_smth(claim_id, 'status')
+    return status, version
 
 
 def compose_all_info(order_id):
@@ -65,8 +108,7 @@ def create_modules(order_id):
 
     contact = {
         'name': local['name'],
-        'phone': phonenumbers.format_number(
-            phonenumbers.parse(local['phone'], 'RU'), phonenumbers.PhoneNumberFormat().E164)
+        'phone': local['phone']
     }
 
     external_order_cost = {
@@ -96,7 +138,7 @@ def create_modules(order_id):
     }
 
 
-def generate_post_body(orders_ids_list):
+def create_post_body(orders_ids_list):
 
     post_body = {
         'items': [],
@@ -114,7 +156,7 @@ def generate_post_body(orders_ids_list):
 
 
 def create_yandex_order(orders_ids_list):
-    post_body = generate_post_body(orders_ids_list)
+    post_body = create_post_body(orders_ids_list)
 
     params = {'request_id': uuid.uuid1()}
 
@@ -124,24 +166,11 @@ def create_yandex_order(orders_ids_list):
     )
     cont = json.loads(str(resp.content, encoding='utf-8'))
 
-    # try:
     if resp.status_code == 200:
         print('CORRECTLY ADDED')
-        # log.info(
-        #     f'YANDEX create "{data["order_id"]}":\n    status_code: {resp.status_code}')
-        # claim_id, version = cont['id'], cont['version']
-        # status = yandex_get_status_after_estimating(claim_id)
-        # log.info(
-        #     f'YANDEX create "{data["order_id"]}":\n    status: {status}')
-        # yandex_write_to_db(order_id=claim_id,
-        #                    order_status=status,
-        #                    order_version=version)
-        # return resp.status_code, ''
-    else:
-        print('ERROR ADDING', cont['message'], resp.status_code)
-        # log.warning(
-        #     f'YANDEX create "{data["order_id"]}":\n    status_code: {resp.status_code}\n    msg:{cont["message"]}')
-    # except:
-        # log.exception()
-
+        claim_id = cont['id']
+        status, version = get_status_after_estimating(claim_id)
+        # return approve(claim_id, version)
+        return 200, status
+    print('ERROR ADDING', cont['message'], resp.status_code)
     return resp.status_code, cont['message']

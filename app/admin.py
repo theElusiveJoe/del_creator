@@ -8,6 +8,7 @@ from db_logic.local_yandex_orders.bd_api_funcs import get_orders as get_orders_f
 
 from db_logic.local_yandex_orders.bd_api_funcs import upd_cluster_num as upd_cluster_num_in_local_db
 from db_logic.local_yandex_orders.bd_api_funcs import upd_cluster_seq as upd_cluster_seq_in_local_db
+from db_logic.local_yandex_orders.bd_api_funcs import drop_cluster as drop_cluster_in_local_db
 
 from apis.yandex_go_corp.yandex_go_corp import create_yandex_order
 
@@ -16,6 +17,7 @@ import sys
 import json
 import os
 import hashlib
+import phonenumbers
 
 handler = logging.StreamHandler(stream=sys.stdout)
 log = logging.getLogger(__name__)
@@ -65,6 +67,14 @@ def add_order_raw():
 
     if request.method == 'POST':
         request_order_id = request.form['order_id']
+        form = dict(request.form)
+        try:
+            form['phone'] =  phonenumbers.format_number(
+            phonenumbers.parse(form['phone'], 'RU'), phonenumbers.PhoneNumberFormat().E164) 
+        except phonenumbers.phonenumberutil.NumberParseException:
+            primary_info, _, _, _ = get_order_info_for_local_order(request_order_id)
+            return render_template('/admin/add_order.html', raw=False, primary_info=primary_info, ymaps_token=ymaps_token, err_msg = 'Ошибка парсинга телефона')
+        
         if 'last_order_id' in session.keys() and request_order_id == session['last_order_id']:
             print('CACHING WORKED')
             add_order_to_local_db(
@@ -129,8 +139,14 @@ def upd_cluster():
 @bp.route('/register_cluster_in_yandex', methods=['POST'])
 def register_cluster_in_yandex():
     upd_cluster_seq_in_local_db(request.json['orders_ids'])
-    create_yandex_order(
-        request.json['orders_ids']
-    )
+    result_code, result_message = create_yandex_order(request.json['orders_ids'])
 
-    return 'ok'
+    if result_code == 200:
+        pass
+        # drop_cluster_in_local_db(orders_ids)
+
+    resp = {
+        'code': 200,
+        'message': result_message
+    }
+    return json.dumps(resp, ensure_ascii=False)

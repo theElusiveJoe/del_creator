@@ -14,8 +14,6 @@ with open('tokens/tokens.json', 'r') as tf:
 
 def download_order_row(order_id):
     def to_int(rawstr):
-        if not rawstr:
-            return 0
         print('CONVERTING', rawstr)
         res = ''.join(filter(lambda x: ord(x) < 100, rawstr)).replace(' ', '')
         print('CONVERTED', res)
