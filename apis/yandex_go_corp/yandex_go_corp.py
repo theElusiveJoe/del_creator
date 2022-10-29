@@ -85,9 +85,9 @@ def create_modules(order_id):
         "pickup_point": 1,
         "quantity": 1,
         "size": {
-            "height": int(local['size'].replace('\\', '/').strip().split('/')[0])/100,
-            "length": int(local['size'].replace('\\', '/').strip().split('/')[1])/100,
-            "width": int(local['size'].replace('\\', '/').strip().split('/')[2])/100
+            "height": local['size_x'],
+            "length": local['size_y'],
+            "width": local['size_z']
         },
         "title": "набор пакетов",
         "weight": float(local['weight']),
@@ -102,7 +102,7 @@ def create_modules(order_id):
     # точка выгрузки
     address = {
         'comment': local['del_comment'],
-        'coordinates': [float(local['long']), float(local['lat'])],
+        'coordinates': [local['long'], local['lat']],
         'fullname': local['fullname']
     }
 
@@ -171,6 +171,6 @@ def create_yandex_order(orders_ids_list):
         claim_id = cont['id']
         status, version = get_status_after_estimating(claim_id)
         # return approve(claim_id, version)
-        return 200, status
+        return 200, None, cont['id']
     print('ERROR ADDING', cont['message'], resp.status_code)
-    return resp.status_code, cont['message']
+    return resp.status_code, cont['message'], None

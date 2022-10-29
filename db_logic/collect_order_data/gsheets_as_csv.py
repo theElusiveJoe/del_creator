@@ -14,10 +14,9 @@ with open('tokens/tokens.json', 'r') as tf:
 
 def download_order_row(order_id):
     def to_int(rawstr):
-        print('CONVERTING', rawstr)
         res = ''.join(filter(lambda x: ord(x) < 100, rawstr)).replace(' ', '')
-        print('CONVERTED', res)
         return res
+
     log.info(f'GSHEETS get_line "{order_id}"')
     table = pd.read_csv(csv_link, header=1, usecols=[x for x in range(19)]).rename(
         columns={'Число': 'date',
@@ -42,6 +41,8 @@ def download_order_row(order_id):
     row = table[table['id'] == order_id].iloc[0].fillna('').to_dict()
     row['emoney'] = to_int(row['emoney'])
     row['cache'] = to_int(row['cache'])
+    print(row)
+    print('ОПЛАААЧНООО?????', row['paid'], row['paid'] == 'оплачено')
     row['paid'] = row['paid'] == 'оплачено'
     row['positions'] = to_int(row['positions']) if len(row['positions']) > 0 else '0'
 

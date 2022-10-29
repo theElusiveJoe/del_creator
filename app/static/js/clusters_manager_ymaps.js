@@ -27,7 +27,6 @@ var cluster_color_mapping = {
 
 
 function load_orders(cl_num) {
-    console.log('LOADING CLUSTER', cl_num)
     //    обновляем карту
     document.querySelector("#orders_list").innerHTML = ''
     if (!!map_obj) {
@@ -39,7 +38,7 @@ function load_orders(cl_num) {
     });
     //    запрашиваем заказы
     $.get({
-        url: "/admin/get_orders",
+        url: "/admin/get_orders_by_cluster",
         data: {
             'cluster_num': cl_num
         },
@@ -164,7 +163,9 @@ $("#yandex_btn").click(
                     if (resp.code != 200){
                         document.getElementById('msg').innerHTML = resp['message']
                     } else {
-                        load_orders()
+                        clean_page()
+                        // load_clusters_nums
+                        // load_orders()
                         document.getElementById('msg').innerHTML = 'Кластер обработан корректно'
                     }
                 }
@@ -173,4 +174,51 @@ $("#yandex_btn").click(
     }
 )
 
-load_clusters_nums()
+
+$("#pdf_btn").click(
+    function(){
+        var rows = document.getElementsByTagName("tbody")[0].getElementsByTagName("tr")
+        var orders = []
+        console.log(rows)
+        for (var i = 0; i < rows.length; i++){
+            orders.push(rows[i].firstChild.innerHTML)
+        }
+        if (orders.length > 0){
+            $.ajax({
+                type: "POST",
+                url: "/admin/create_pdf_for_cluster",
+                data: JSON.stringify({
+                    orders_ids: orders
+                }),
+                contentType: "application/json",
+                success: function(result){
+                    var resp = JSON.parse(result)
+                    console.log(resp)
+                    // var msg = resp['message']
+                    if (resp.code != 200){
+                        document.getElementById('msg').innerHTML = resp['message']
+                    } else {
+                        clean_page()
+                        // load_clusters_nums
+                        // load_orders()
+                        document.getElementById('msg').innerHTML = 'Кластер обработан корректно'
+                    }
+                }
+            });
+        }
+    }
+)
+
+
+
+function clean_page(){
+    document.querySelector("#orders_list").innerHTML = ''
+    
+    if (!!map_obj) {
+        map_obj.destroy()
+    }
+
+    load_clusters_nums()
+}
+
+clean_page()

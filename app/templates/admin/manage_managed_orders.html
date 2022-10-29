@@ -1,0 +1,44 @@
+{% extends 'admin/base.html' %}
+
+{% block head %}
+<title>Распределяем заказы</title>
+
+<!--jquery-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!--ymaps init-->
+<script src="https://api-maps.yandex.ru/2.1/?apikey={{ymaps_token}}&lang=ru_RU" type="text/javascript">
+</script>
+
+
+{% endblock %}
+
+{% block body%}
+<div class="modal-body row">
+    <h1>Уже где-то зарегистрированные заказы</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Дата создания</th>
+                <th>Сервис доставки</th>
+                <th>Идентификатор сервиса</th>
+                <th>расформировать</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders: %}
+            <tr>
+                <th> {{order['order_id']}}</th>
+                <th> {{order['date_managed']}}</th>
+                <th> {{order['del_service']}}</th>
+                <th> {{order['order_id'] if order['del_service'] == 'yandex' else order['invoice_file_name']}}</th>
+                <th> <button onclick="drop_order('{{order["order_id"]}}')"> расформировать </button></th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    <script src="/static/js/manage_managed.js"></script>
+    {% endblock %}

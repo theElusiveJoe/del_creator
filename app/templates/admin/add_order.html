@@ -70,13 +70,13 @@
 
                         <div class="form-group w-50" style="display: inline-block;">
                                 
-                                <input type="hidden" value="0" name="paid" checked>
                                 <input type="checkbox" role='switch' class="form-check-input" data-toggle="switchbutton" name="paid"
                                 data-offlabel="берет"
                                 data-onlabel="не_берет"
-                                value="1" 
-                                {% if  not primary_info['paid'] %} checked {% endif %}>
+                                value="0" 
+                                {% if  not primary_info["paid"]: %} checked {% endif %}>
                                 <label>курьер берет деньги с клиента</label> <br>
+                                <input type="hidden" value="1" name="paid" checked>
                         </div>
 
                         <div class="form-group w-50">
@@ -101,7 +101,7 @@
 
                 <label><b>Деньги</b></label><br>
                 <label>{{ primary_info['cache'] }}</label><label>{{ primary_info['emoney'] }}</label><br>
-                <label>{{ primary_info['paid'] }}</label><br>
+                <label>{% if primary_info['paid']: %} уже оплачено, курьер не берет деньги {% else : %} не полачено, курьер должен взять деньги {% endif %}</label><br>
 
                 <br>
 

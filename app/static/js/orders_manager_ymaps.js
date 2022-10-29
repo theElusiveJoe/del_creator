@@ -53,14 +53,15 @@ function load_orders() {
     }
     map_obj = new ymaps.Map("map", {
         center: [55.76, 37.64],
-        zoom: 10
+        zoom: 9
     });
     //    запрашиваем заказы
     $.get({
-        url: "/admin/get_orders",
+        url: "/admin/get_unmanaged_orders",
         success: function (result) {
             var orders = JSON.parse(result)['orders']
-            
+            console.log(orders)
+
             clusters = [],
             points = [],
             document.querySelector("#dropdown_cluster_variants").innerHTML = ""
