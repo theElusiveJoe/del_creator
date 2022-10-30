@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, inspect, update, select, desc
+from sqlalchemy import create_engine, inspect, update, select, desc, delete
 from sqlalchemy import Table, Column, Integer, String, MetaData, DateTime, Numeric, Boolean, Float
 
 from apis.geocoder.geocoder import address_to_coords
@@ -8,7 +8,7 @@ import datetime
 
 DBFILEPATH = 'sqlite:///db.db'
 
-engine = create_engine(DBFILEPATH)
+engine = create_engine(DBFILEPATH, echo=True)
 meta = MetaData()
 
 
@@ -49,8 +49,23 @@ orders = Table(
 meta.create_all(engine)
 
 
+def drop_old_orders():
+    with engine.connect() as conn:
+        orders_list = conn.execute(select(orders.c.order_id, orders.c.date_managed).where(orders.c.date_managed != None)).fetchall()
+        orders_list = list(map(lambda x: x._asdict(), orders_list))
+        for order in orders_list:
+            print(datetime.datetime.now(), order['date_managed'])
+            if (datetime.datetime.now() - order['date_managed']).days > 30:
+                stmt = (
+                    delete(orders).
+                    where(orders.c.order_id == order['order_id'])
+                )
+                conn.execute(stmt)
+
+
 def add_order(form, gsheets):
     with engine.connect() as conn:
+
         # ищем косяки в данных
         try:
             long, lat = address_to_coords(form['fullname'])
@@ -258,6 +273,7 @@ def drop_formed_order(order_uuid):
 
 
 def pop_from_formed_order(order_id):
+    drop_old_orders()
     with engine.connect() as conn:
         stmt = (
             update(orders).
