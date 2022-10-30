@@ -18,7 +18,7 @@ with open(os.path.join(sys.path[0], 'tokens/tokens.json'), 'r') as tokens:
     tokens = json.load(tokens)
 
 app = Flask(__name__)
-app.secret_key = os.urandom(12)
+app.secret_key = b'12345678'
 app.register_blueprint(admin_bp)
 
 @app.route('/', methods=['GET', 'POST'])
