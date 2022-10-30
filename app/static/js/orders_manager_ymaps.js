@@ -26,6 +26,18 @@ var cluster_color_mapping = {
 }
 
 
+function delete_order(order_i_d){
+    $.ajax({
+        type: "POST",
+        url: "/admin/del_order",
+        data: JSON.stringify({
+            order_id: order_i_d,
+        }),
+        contentType: "application/json",
+        success: load_orders
+    });
+}
+
 function click_on_order(order_id) {
     var tr = document.querySelector("#order" + order_id)
     for (var i = 0; i < points.length; i++) {
@@ -53,7 +65,7 @@ function load_orders() {
     }
     map_obj = new ymaps.Map("map", {
         center: [55.76, 37.64],
-        zoom: 9
+        zoom: 11
     });
     //    запрашиваем заказы
     $.get({
@@ -78,6 +90,13 @@ function load_orders() {
                 $("<td>").html(order["weight"]).appendTo(tr)
                 $("<td>").html(order["positions"]).appendTo(tr)
                 $("<td>").html(order["comment"]).appendTo(tr)
+                var del_btn = document.createElement("button")
+                del_btn.innerHTML = "del"
+                del_btn.onclick = function(){ delete_order(order['order_id'])}
+                // tr.childNodes.push(del_btn)
+                var td = document.createElement("td")
+                td.append(del_btn)
+                tr.append(td)
                 document.querySelector("#orders_list").appendChild(tr)
                 tr.onclick = function () { click_on_order(order["order_id"]) }
 

@@ -47,8 +47,8 @@ def login():
 
 @bp.route('/add_order.html', methods=['GET', 'POST'])
 def add_order_raw():
-    # if not session.get('logged_in'):
-    #     return render_template('/admin/login.html')
+    if not session.get('logged_in'):
+        return render_template('/admin/login.html')
 
     if request.method == 'GET':
         # если просто запрос на страничку
@@ -115,8 +115,8 @@ def add_order_raw():
 
 @bp.route('/manage_orders.html', methods=['GET', 'POST'])
 def manage_orders():
-    # if not session.get('logged_in'):
-    #     return render_template('/admin/login.html')
+    if not session.get('logged_in'):
+        return render_template('/admin/login.html')
 
     if request.method == 'GET':
         return render_template('/admin/manage_orders.html', ymaps_token=ymaps_token)
@@ -124,8 +124,8 @@ def manage_orders():
 
 @bp.route('/manage_cluster.html', methods=['GET', 'POST'])
 def manage_clusters():
-    # if not session.get('logged_in'):
-    # return render_template('/admin/login.html')
+    if not session.get('logged_in'):
+        return render_template('/admin/login.html')
 
     if request.method == 'GET':
         return render_template('/admin/manage_clusters.html', ymaps_token=ymaps_token)
@@ -241,8 +241,8 @@ def get_invoice_file(filename):
 
 @bp.route('/manage_managed_orders.html', methods=['GET', 'POST'])
 def manage_manage_orders():
-    # if not session.get('logged_in'):
-    #     return render_template('/admin/login.html')
+    if not session.get('logged_in'):
+        return render_template('/admin/login.html')
 
     if request.method == 'GET':
         orders = local_db.get_managed_orders()
@@ -290,4 +290,13 @@ def pop_from_managed():
     # проверяем, нужно ли удалить какой-нибудь файл
     check_invoice_files()
 
+    return 'ok'
+
+
+@bp.route('/del_order', methods=['POST'])
+def del_order():
+    print('DELETE POST IS HERE')
+    print(request.json)
+    print('DELETE POST IS HERE', request.json)
+    local_db.del_order(request.json['order_id'])
     return 'ok'

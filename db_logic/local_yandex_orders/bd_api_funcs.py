@@ -48,6 +48,13 @@ orders = Table(
 
 meta.create_all(engine)
 
+def del_order(order_id):
+    with engine.connect() as conn:
+        stmt = (
+            delete(orders).
+            where(orders.c.order_id == order_id)
+        )
+        conn.execute(stmt)
 
 def drop_old_orders():
     with engine.connect() as conn:

@@ -15,13 +15,14 @@
 
 {% block body%}
 <div class="modal-body row">
-    <h1>Уже где-то зарегистрированные заказы</h1>
+    <h3>Уже где-то зарегистрированные заказы</h3>
     <table class="table">
         <thead>
             <tr>
                 <th>id</th>
                 <th>Дата создания</th>
                 <th>Сервис доставки</th>
+                <th>Адрес</th>
                 <th>Идентификатор сервиса</th>
                 <th>расформировать всё</th>
                 <th>убрать этот</th>
@@ -33,19 +34,20 @@
             <tr>
                 <th> {{order['order_id']}}</th>
                 <th> {{order['date_managed']}}</th>
-                <th> {{order['del_service']}}</th>
+                <th> {% if order['del_service'] == 'carrier' %} наш курьер {% else %} Yandex Go {% endif %}</th>
+                <th> {{order['fullname']}}</th>
                 <th> {{order['del_service_id'] if order['del_service'] == 'yandex' else order['invoice_file_name']}}
                 </th>
 
                 <th> <button onclick="drop_order('{{order["order_id"]}}')"> расформировать </button></th>
                 <th>
                     {% if order['del_service'] != 'yandex': %}
-                            <button onclick="pop_from_managed('{{order["order_id"]}}')"> убрать этот </button>
+                    <button onclick="pop_from_managed('{{order["order_id"]}}')"> убрать этот </button>
                     {% endif%}
                 </th>
 
                 <th> {% if order['del_service'] != 'yandex': %}
-                        <button onclick="edit_order('{{order["order_id"]}}')"> редактировать </button>
+                    <button onclick="edit_order('{{order["order_id"]}}')"> редактировать </button>
                     {% endif %}
                 </th>
             </tr>

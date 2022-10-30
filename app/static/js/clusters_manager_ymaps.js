@@ -34,7 +34,7 @@ function load_orders(cl_num) {
     }
     map_obj = new ymaps.Map("map", {
         center: [55.76, 37.64],
-        zoom: 9
+        zoom: 11
     });
     //    запрашиваем заказы
     $.get({
