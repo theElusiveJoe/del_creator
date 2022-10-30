@@ -16,7 +16,7 @@
 {% block body%}
 <div class="modal-body row">
     <div class="col-md-6">
-        <div id="map" style="width:500px; height:500px"></div>
+        <div id="map" style="width:300px; height:300px"></div>
     </div>
 
     <div class="col-md-6">
@@ -26,6 +26,8 @@
                     <th>кл</th>
                     <th>order_id</th>
                     <th>время</th>
+                    <th>адрес</th>
+                    <th>оплата</th>
                     <th>вес</th>
                     <th>мест</th>
                     <th>комментарий</th>
@@ -33,17 +35,14 @@
             </thead>
             <tbody id="orders_list"></tbody>
         </table>
-        <div style="display:inline-block;">
-            <button id="drop_claster_button" class="btn btn-primary">drop cluster</button>
-            <button id="new_claster_button" class="btn btn-primary">new cluster</button>
-            <div class="dropdown">
+        <div>
+            <button id="drop_claster_button" class="btn btn-primary" style="display:inline-block;">в нулевой кластер</button>
+            <button id="new_claster_button" class="btn btn-primary" style="display:inline-block;">в новый кластер</button>
+            <div class="dropdown" style="display:inline-block;">
                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    mov cluster
-                </button>
+                    data-bs-toggle="dropdown" aria-expanded="false">переместить в</button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="dropdown_cluster_variants">
                 </ul>
-                
             </div>
         </div>
         <!-- <button id="upd_claster_button" class="btn btn-primary">move to cluster</button> -->

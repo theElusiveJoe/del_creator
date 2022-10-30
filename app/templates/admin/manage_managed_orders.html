@@ -23,7 +23,9 @@
                 <th>Дата создания</th>
                 <th>Сервис доставки</th>
                 <th>Идентификатор сервиса</th>
-                <th>расформировать</th>
+                <th>расформировать всё</th>
+                <th>убрать этот</th>
+                <th>редактировать</th>
             </tr>
         </thead>
         <tbody>
@@ -32,13 +34,25 @@
                 <th> {{order['order_id']}}</th>
                 <th> {{order['date_managed']}}</th>
                 <th> {{order['del_service']}}</th>
-                <th> {{order['order_id'] if order['del_service'] == 'yandex' else order['invoice_file_name']}}</th>
+                <th> {{order['del_service_id'] if order['del_service'] == 'yandex' else order['invoice_file_name']}}
+                </th>
+
                 <th> <button onclick="drop_order('{{order["order_id"]}}')"> расформировать </button></th>
+                <th>
+                    {% if order['del_service'] != 'yandex': %}
+                            <button onclick="pop_from_managed('{{order["order_id"]}}')"> убрать этот </button>
+                    {% endif%}
+                </th>
+
+                <th> {% if order['del_service'] != 'yandex': %}
+                        <button onclick="edit_order('{{order["order_id"]}}')"> редактировать </button>
+                    {% endif %}
+                </th>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
-    <script src="/static/js/manage_managed.js"></script>
-    {% endblock %}
+<script src="/static/js/manage_managed.js"></script>
+{% endblock %}

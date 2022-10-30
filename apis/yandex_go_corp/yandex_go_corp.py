@@ -53,6 +53,25 @@ def approve(claim_id, version):
     return resp.status_code, cont['message']
 
 
+def cancel_yandex_order(claim_id):
+    query_params = {
+        'claim_id': claim_id
+    }
+    to_post = {
+        'version': 1,
+        'cancel_state': 'free'
+    }
+    resp = requests.post(
+        f'https://b2b.taxi.yandex.net/b2b/cargo/integration/v2/claims/cancel', headers=headers, params=query_params, data=json.dumps(to_post))
+
+    if resp.status_code == 200:
+        return 200, 'all ok'
+
+    cont = json.loads(str(resp.content, encoding='utf-8'))
+    return resp.status_code, cont['message']
+
+
+
 def get_status_after_estimating(claim_id):
     status, version = get_smth(claim_id, 'status')
     while status == 'estimating' or status == 'new':

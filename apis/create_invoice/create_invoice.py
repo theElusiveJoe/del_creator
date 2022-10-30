@@ -34,10 +34,9 @@ def create_md(orders_ids, filename):
     mdFile.create_md_file()
 
 
-def create_invoice_file(orders_ids):
-    md_file_name = str(uuid.uuid1())
+def create_invoice_file(orders_ids, claim_id):
+    md_file_name = html_file_name = claim_id
     create_md(orders_ids, md_file_name)
-    html_file_name = '_'.join(orders_ids)
     try:
         os.mkdir('invoices/')
     except:

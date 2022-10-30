@@ -8,7 +8,7 @@ import datetime
 
 DBFILEPATH = 'sqlite:///db.db'
 
-engine = create_engine(DBFILEPATH, echo=True)
+engine = create_engine(DBFILEPATH)
 meta = MetaData()
 
 
@@ -51,9 +51,7 @@ meta.create_all(engine)
 
 def add_order(form, gsheets):
     with engine.connect() as conn:
-        stmt1 = orders.delete().where(orders.c.order_id == form['order_id'])
-        conn.execute(stmt1)
-
+        # ищем косяки в данных
         try:
             long, lat = address_to_coords(form['fullname'])
         except:
@@ -71,31 +69,61 @@ def add_order(form, gsheets):
         except phonenumbers.phonenumberutil.NumberParseException:
             return f'Ошибка парсинга телефона: {form["phone"] if form["phone"] else "его нет"}'
 
-        print('FORM:', form)
-        stmt2 = orders.insert().values(
-            order_id=form['order_id'],
+        # ищем новый заказ в базе
+        stmt1 = select(orders).where(orders.c.order_id == form['order_id'])
+        result = conn.execute(stmt1).fetchone()
 
-            paid=bool(int(form['paid'])),
-            price=form['price'],
-            comment=form['comment'],
+        if not result:
+            # если заказа нет, то вставляем
+            stmt2 = orders.insert().values(
+                order_id=form['order_id'],
 
-            name=form['name'],
-            phone=form['phone'],
+                paid=bool(int(form['paid'])),
+                price=form['price'],
+                comment=form['comment'],
 
-            fullname=form['fullname'],
-            del_comment=form['del_comment'],
-            lat=lat,
-            long=long,
+                name=form['name'],
+                phone=form['phone'],
 
-            cluster='0',
+                fullname=form['fullname'],
+                del_comment=form['del_comment'],
+                lat=lat,
+                long=long,
 
-            weight=float(str(gsheets['weight']).replace(',', '.')),
-            positions=int(gsheets['positions']),
-            size_x=size_x/100,
-            size_y=size_y/100,
-            size_z=size_z/100,
-            del_time_interval=gsheets['del_time_interval']
-        )
+                cluster='0',
+
+                weight=float(str(gsheets['weight']).replace(',', '.')),
+                positions=int(gsheets['positions']),
+                size_x=size_x/100,
+                size_y=size_y/100,
+                size_z=size_z/100,
+                del_time_interval=gsheets['del_time_interval']
+            )
+        else:
+            # иначе, обновляем данные по этому заказу
+            stmt2 = update(orders).where(orders.c.order_id == form['order_id']).values(
+                paid=bool(int(form['paid'])),
+                price=form['price'],
+                comment=form['comment'],
+
+                name=form['name'],
+                phone=form['phone'],
+
+                fullname=form['fullname'],
+                del_comment=form['del_comment'],
+                lat=lat,
+                long=long,
+
+                cluster='0',
+
+                weight=float(str(gsheets['weight']).replace(',', '.')),
+                positions=int(gsheets['positions']),
+                size_x=size_x/100,
+                size_y=size_y/100,
+                size_z=size_z/100,
+                del_time_interval=gsheets['del_time_interval']
+            )
+        stmt2 = stmt2
 
         result = conn.execute(stmt2)
 
@@ -120,6 +148,7 @@ def get_managed_orders():
         result = conn.execute(stmt)
 
         result = list(map(lambda x: x._asdict(), result))
+        result.sort(key=lambda x: x['date_managed'], reverse=True)
         for i, _ in enumerate(result):
             result[i]['date_managed'] = result[i]['date_managed'].strftime(
                 '%H:%M %d/%m/%Y')
@@ -141,7 +170,17 @@ def get_order_by_id(order_id):
         stmt = orders.select().where(orders.c.order_id == order_id)
         result = conn.execute(stmt).fetchone()
         print(result)
-        return result._asdict()
+        if result:
+            return result._asdict()
+        return None
+
+
+def get_orders_by_del_service_id(del_service_id):
+    with engine.connect() as conn:
+        stmt = select(orders.c.order_id).where(
+            orders.c.del_service_id == del_service_id)
+        result = conn.execute(stmt)
+        return list(map(lambda x: x._asdict()['order_id'], result))
 
 
 def get_invoice_fileslist():
@@ -202,7 +241,7 @@ def create_invoice_for_cluster(orders_ids, invoice_file_name, cluster_uuid):
                 update(orders).
                 where(orders.c.order_id == order_id).
                 values(cluster=None, del_service='carrier',
-                       invoice_file_name=invoice_file_name, date_managed=datetime.datetime.now(), del_service_id = cluster_uuid)
+                       invoice_file_name=invoice_file_name, date_managed=datetime.datetime.now(), del_service_id=cluster_uuid)
             )
             conn.execute(stmt)
 
@@ -212,7 +251,19 @@ def drop_formed_order(order_uuid):
         stmt = (
             update(orders).
             where(orders.c.del_service_id == order_uuid).
-            values(cluster=0, del_service=None, date_managed = None, del_service_id = None, invoice_file_name = None)
+            values(cluster=0, del_service=None, date_managed=None,
+                   del_service_id=None, invoice_file_name=None)
+        )
+        conn.execute(stmt)
+
+
+def pop_from_formed_order(order_id):
+    with engine.connect() as conn:
+        stmt = (
+            update(orders).
+            where(orders.c.order_id == order_id).
+            values(cluster=0, del_service=None, date_managed=None,
+                   del_service_id=None, invoice_file_name=None)
         )
         conn.execute(stmt)
 
