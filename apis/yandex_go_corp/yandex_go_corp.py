@@ -161,7 +161,8 @@ def create_post_body(orders_ids_list):
 
     post_body = {
         'items': [],
-        'route_points': [constants['warehouse_route_point']]
+        'route_points': [constants['warehouse_route_point']],
+        'emergency_contact': constants['emergency_contact'],
     }
 
     for order_id in orders_ids_list:

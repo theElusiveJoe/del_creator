@@ -7,22 +7,22 @@
 <!--ymaps geocoder-->
 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey={{ymaps_token}}" type="text/javascript"></script>
 <script type="text/javascript">
-    ymaps.ready(init);
-    function init() {
-        var suggestView1 = new ymaps.SuggestView('fullname');
-    }
+        ymaps.ready(init);
+        function init() {
+                var suggestView1 = new ymaps.SuggestView('fullname');
+        }
 </script>
 {% endif %}
 
 <style>
-#suggest1{
-    width: 300px;
-    margin: 5px;
-}
+        #suggest1 {
+                width: 300px;
+                margin: 5px;
+        }
 
-.header {
-    padding: 5px;
-}
+        .header {
+                padding: 5px;
+        }
 </style>
 {% endblock %}
 
@@ -34,86 +34,90 @@
                 <input type="text" class="form-control" name="order_id" required>
         </div>
         <input type="submit" class="btn btn-primary" value="подгрузить">
-        {% if protection: %}<h6>Заказ {{protection}} уже куда-то отпрален. Его можно отредактировать в " Уже созданные"</h6> {% endif %}
+        {% if protection: %}<h6>Заказ {{protection}} уже куда-то отпрален. Его можно отредактировать в " Уже созданные"
+        </h6> {% endif %}
 </form>
 
 {% if not raw %}
 <hr>
 <div class="modal-body row">
-        <div class="col-md-6">
-                <form role="form" action="/admin/add_order.html" method="POST">
+        <!-- <div class="col-md-6"> -->
+        <form role="form" action="/admin/add_order.html" method="POST">
 
-                        <div class="form-group w-50">
-                                <label>id заказа</label>
-                                <input type="text" class="form-control" name="order_id" value="{{primary_info['order_id']}}" required>
-                        </div>
+                <div class="form-group w-50">
+                        <label>id заказа</label>
+                        <input type="text" class="form-control" name="order_id" value="{{primary_info['order_id']}}"
+                                required>
+                </div>
 
-                        <div class="form-group w-50">
-                                <label>комментарий к заказу</label>
-                                <input type="text" class="form-control" name="comment" value="{{primary_info['comment']}}">
-                        </div>
+                <div class="form-group w-50">
+                        <label>комментарий к заказу</label>
+                        <textarea type="text" class="form-control" name="comment">{{primary_info['comment']}}</textarea>
+                </div>
 
 
-                        <div class="form-group w-50">
-                                <label>имя клиента</label>
-                                <input type="text" class="form-control" name="name" value="{{primary_info['name']}}" required>
-                        </div>
+                <div class="form-group w-50">
+                        <label>имя клиента</label>
+                        <input type="text" class="form-control" name="name" value="{{primary_info['name']}}" required>
+                </div>
 
-                        <div class="form-group w-50">
-                                <label>телефон клиента</label>
-                                <input type="text" class="form-control" name="phone" value="{{primary_info['phone']}}" required>
-                        </div>
-                        
-                        <div class="form-group w-50">
-                                <label>объявленная стоимость заказа</label>
-                                <input type="text" class="form-control" name="price" 
-                                {%if 'emoney' in primary_info %}
-                                value="{{primary_info['emoney'] + primary_info['cache']}}"
-                                {%else %} 
-                                value="{{primary_info['price']}}"
-                                {%endif%}>
-                        </div>
+                <div class="form-group w-50">
+                        <label>телефон клиента</label>
+                        <input type="text" class="form-control" name="phone" value="{{primary_info['phone']}}" required>
+                </div>
 
-                        <div class="form-group w-50" style="display: inline-block;">
-                                
-                                <input type="checkbox" role='switch' class="form-check-input" data-toggle="switchbutton" name="paid"
-                                data-offlabel="берет"
-                                data-onlabel="не_берет"
-                                value="0" 
-                                {% if  not primary_info["paid"]: %} checked {% endif %}>
-                                <label>курьер берет деньги с клиента</label> <br>
-                                <input type="hidden" value="1" name="paid" checked>
-                        </div>
+                <div class="form-group w-50">
+                        <label>объявленная стоимость заказа</label>
+                        <input type="text" class="form-control" name="price" {%if 'emoney' in primary_info %}
+                                value="{{primary_info['emoney'] + primary_info['cache']}}" {%else %}
+                                value="{{primary_info['price']}}" {%endif%}>
+                </div>
 
-                        <div class="form-group w-50">
-                                <label>адрес вместе с городом</label>
-                                <input type="text" class="form-control" name="fullname" id="fullname" value="{{primary_info['fullname']}}" required>
-                        </div>
+                <div class="form-group w-50" style="display: inline-block;">
 
-                        <div class="form-group w-50">
-                                <label>Комментарий курьеру</label>
-                                <input type="text" class="form-control" name="del_comment" value="{{primary_info['del_comment']}}">
-                        </div>
+                        <input type="checkbox" role='switch' class="form-check-input" data-toggle="switchbutton"
+                                name="paid" data-offlabel="берет" data-onlabel="не_берет" value="0" {% if not
+                                primary_info["paid"]: %} checked {% endif %}>
+                        <label>курьер берет деньги с клиента</label> <br>
+                        <input type="hidden" value="1" name="paid" checked>
+                </div>
 
-                        <input type="submit" class="btn btn-primary" value="добавить заказик">
-                </form>
-                <hr>
-        </div>
+                <div class="form-group w-50">
+                        <label>адрес вместе с городом</label>
+                        <textarea type="text" class="form-control" name="fullname" id="fullname"
+                                required>{{primary_info['fullname']}}</textarea>
+                </div>
 
-        <div class="col-md-6">
-                {{ primary_info['comments'] }}
-
-                <br><br>
-
-                <label><b>Деньги</b></label><br>
-                <label>{{ primary_info['cache'] }}</label><label>{{ primary_info['emoney'] }}</label><br>
-                <label>{% if primary_info['paid']: %} уже оплачено, курьер не берет деньги {% else : %} не полачено, курьер должен взять деньги {% endif %}</label><br>
-
+                <div class="form-group w-50">
+                        <label>Комментарий курьеру</label>
+                        <textarea type="text" class="form-control" name="del_comment"
+                                >{{primary_info['del_comment']}}</textarea>
+                </div>
                 <br>
+                <div class="form-group w-50">
+                        <input type="submit" class="btn btn-primary" value="добавить заказик">
+                </div>
+        </form>
 
-                <label>{{ primary_info['comments'] }}</label>
-                {% if err_msg%}<h4>{{err_msg}}</h4> {% endif %}
-        </div>
+        <br><br>
+        <hr>
+        <!-- </div> -->
+
+        <!-- <div class="col-md-6"> -->
+        {{ primary_info['comments'] }}
+
+        <br><br>
+
+        <label><b>Деньги</b></label><br>
+        <label>{{ primary_info['cache'] }}</label><label>{{ primary_info['emoney'] }}</label><br>
+        <label>{% if primary_info['paid']: %} уже оплачено, курьер не берет деньги {% else : %} не полачено, курьер
+                должен взять деньги {% endif %}</label><br>
+
+        <br>
+
+        <label>{{ primary_info['comments'] }}</label>
+        {% if err_msg%}<h4>{{err_msg}}</h4> {% endif %}
+        <!-- </div> -->
 </div>
 
 

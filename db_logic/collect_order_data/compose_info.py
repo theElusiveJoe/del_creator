@@ -61,7 +61,7 @@ def get_order_info_for_local_order(order_id):
     result['pay_type'] = gsheets_info['payment_method']
     result['cache'] = gsheets_info['cache']
     result['emoney'] = gsheets_info['emoney']
-    result['comment'] = gsheets_info['comment']
+    result['comment'] = gsheets_info['comment'] + shop_info['CustomerComment']
     result['paid'] = gsheets_info['paid']
 
     customer = shop_info['Customer']

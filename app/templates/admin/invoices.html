@@ -18,7 +18,7 @@
         <tbody>
             {% for invoice in invoices: %}
             <tr>
-                <th> <a href=/admin/get_invoice/{{invoice['invoice_file_name']}}> ссылка</a></th>
+                <th> <a href=/admin/get_invoice/{{invoice['invoice_file_name']}} target="_blank"> ссылка</a></th>
                 <th> {{invoice['date_managed']}}</th>
                 <th> {{invoice['orders']}}</th>
             </tr>

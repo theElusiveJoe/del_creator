@@ -38,14 +38,15 @@ def download_order_row(order_id):
                  'Статус': 'status',
                  'примечания': 'comment2',
                  'warehouse': 'warehouse'})
-    row = table[table['id'] == order_id].iloc[0].fillna('').to_dict()
+    row = table[(table['id'] == order_id ) | (table['account_number'] == order_id)].iloc[0].fillna('').to_dict()
     row['emoney'] = to_int(row['emoney'])
     row['cache'] = to_int(row['cache'])
     print(row)
     print('ОПЛАААЧНООО?????', row['paid'], row['paid'] == 'оплачено')
     row['paid'] = row['paid'] == 'оплачено'
     row['positions'] = to_int(row['positions']) if len(row['positions']) > 0 else '0'
-
+    if row['id'] == '':
+        row['id'] = row['account_number']
     return row
 
 

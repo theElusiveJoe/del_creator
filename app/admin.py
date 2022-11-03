@@ -235,6 +235,7 @@ def invoices_list():
 
 @bp.route('get_invoice/<filename>')
 def get_invoice_file(filename):
+    return render_template('/admin/invoice.html', orders = )
     with open(f'invoices/{filename}', 'r') as f:
         return f.read()
 
