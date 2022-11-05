@@ -41,18 +41,18 @@ def download_order_row(order_id):
     row = table[(table['id'] == order_id ) | (table['account_number'] == order_id)].iloc[0].fillna('').to_dict()
     row['emoney'] = to_int(row['emoney'])
     row['cache'] = to_int(row['cache'])
-    print(row)
-    print('ОПЛАААЧНООО?????', row['paid'], row['paid'] == 'оплачено')
     row['paid'] = row['paid'] == 'оплачено'
-    row['positions'] = to_int(row['positions']) if len(row['positions']) > 0 else '0'
+    row['positions'] = to_int(row['positions']) if len(row['positions']) > 0 else 0
     if row['id'] == '':
         row['id'] = row['account_number']
+    print(row)
     return row
 
 
 def get_order_line_from_ghseets(order_id):
     try:
-        return download_order_row(order_id)
+        row = download_order_row(order_id)
+        return row, row['id'] == row['account_number']
     except Exception:
         log.warning(f'GSHEETS get_line "{order_id}" - error')
         raise Exception('Проблемы с гугл таблицей')

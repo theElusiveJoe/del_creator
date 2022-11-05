@@ -13,8 +13,13 @@ log.setLevel(logging.INFO)
 log.addHandler(handler)
 
 
+with open('db_logic/collect_order_data/zippack_patterm.json', 'r') as f:
+    raw_zippack_order = json.load(f)
+
 def get_order_full_info(order_id):
-    row = get_order_line_from_ghseets(order_id.strip())
+    row, by_account = get_order_line_from_ghseets(order_id.strip())
+    if by_account:
+        return row, raw_zippack_order
     if ord('A') <= ord(order_id.strip()[0]) <= ord('Z'):
         try:
             return row, get_order_from_zippack(re.sub("\D", "", order_id))
@@ -30,7 +35,7 @@ def get_order_full_info(order_id):
 
 def get_order_line_from_ghseets_for_yandex_user(order_id):
     try:
-        row = get_order_line_from_ghseets(order_id)
+        row, _ = get_order_line_from_ghseets(order_id)
         if row['габариты']:
             gabs = (
                 sorted(list(map(int, row['габариты'].strip().replace('\\', '/').split('/')))))

@@ -26,3 +26,10 @@ function pop_from_managed(order_id) {
 function edit_order(order_id) {
     location.href = '/admin/add_order.html?order_id='+order_id+'&protection=False'
 }
+
+function get_invoice(order_id) {
+    var link = document.createElement('a')
+    link.setAttribute('href', '/admin/get_invoice/'+order_id)
+    link.setAttribute('target', '_blank')
+    link.click()
+}

@@ -4,31 +4,76 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!--bootstrap-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/style.css" type="text/css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
         crossorigin="anonymous"></script>
-    <link rel="stylesheet" type="text/css" href="/static/css/shitty.css" media="screen" />
-
     <style>
-        body {
-            margin: 30px
+        .biba {
+            font-size: larger;
+            font-weight: 600;
+        }
+
+        form {
+            background-color: white !important;
+            ;
         }
     </style>
 </head>
 
 <body>
-    {% for order in orders %}
-    <div class="container"></div>
-    <h3>{{order['order_id']}}</h3>
-    <div>
-        <label>адрес</label>
-        <b>order['fullname'] + ' ' + order['del_comment']</b>
+    <div class="my-2 mx-3">
+        {% for order in orders: %}
+        <div class="border border-1 p-2 border-dark ">
+            <div class="row">
+                <div class="col-2">
+                    <h3>{{order['order_id']}}</h3>
+                </div>
+                {% if order['del_time_interval']:%}
+                <div class="col-10">
+                    <h6>Интервал доставки: {{order['del_time_interval']}}</h6>
+                </div>
+                {% endif %}
+            </div>
+            <div class="row">
+                <div class="col-9">
+                    <p class="lead mb-1">Адрес:
+                        <strong class="biba">{{order['fullname']}}</strong>
+                        <em style="padding-left: 10px;">{{order['lat']}}°, {{order['long']}}°</em>
+                    </p>
+                    {% if order['del_comment'] != ''%}
+                    <p class="lead mb-1">Комментарии к адресу:
+                        <strong class="biba">{{order['del_comment']}}</strong>
+                    </p>
+                    {% endif %}
+                    <p class="lead mb-1" style="font-weight: 450;">{{order['name']}}
+                        <strwong class="biba">{{order['phone']}}</strong>
+                    </p>
+                </div>
+                {% if not order['paid']: %}
+                <div class="col-3 text-center">
+                    <h5 class="border-bottom border-1 p-2  border-dark">Взять ДЕНЬГИ</h5>
+                    <h5>{{order['price']}}</h5>
+                </div>
+                {% endif %}
+            </div>
+            <p class="lead mb-1">Мест:
+                <strong class="biba">{{order['positions']}}</strong>
+            </p>
+            <div class="row row-cols-auto">
+                <div class="col">
+                    <p class="lead mb-1">Подпись клиента:</p>
+                </div>
+                <div class="col">
+                    <p class="lead mb-1">__________________</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </body>
 
 </html>

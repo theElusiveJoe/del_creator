@@ -72,6 +72,7 @@ function load_orders() {
         url: "/admin/get_unmanaged_orders",
         success: function (result) {
             var orders = JSON.parse(result)['orders']
+            orders.sort((a,b) => (a.cluster > b.cluster) ? 1 : -1)
             console.log(orders)
 
             clusters = [],

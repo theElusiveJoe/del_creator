@@ -48,6 +48,7 @@ orders = Table(
 
 meta.create_all(engine)
 
+# просто удаляет заказ
 def del_order(order_id):
     with engine.connect() as conn:
         stmt = (
@@ -56,6 +57,7 @@ def del_order(order_id):
         )
         conn.execute(stmt)
 
+# удаляет все старые заказы
 def drop_old_orders():
     with engine.connect() as conn:
         orders_list = conn.execute(select(orders.c.order_id, orders.c.date_managed).where(orders.c.date_managed != None)).fetchall()
@@ -69,7 +71,7 @@ def drop_old_orders():
                 )
                 conn.execute(stmt)
 
-
+# добавляет/обновляет заказ
 def add_order(form, gsheets):
     with engine.connect() as conn:
 
@@ -149,7 +151,7 @@ def add_order(form, gsheets):
 
         result = conn.execute(stmt2)
 
-
+# возвращает заказы, для которых не выбран del_service
 def get_unmanaged_orders():
     with engine.connect() as conn:
         stmt = (
@@ -160,7 +162,7 @@ def get_unmanaged_orders():
 
         return list(map(lambda x: x._asdict(), result))
 
-
+# возвращает заказы, для которых выбран del_service
 def get_managed_orders():
     with engine.connect() as conn:
         stmt = (
@@ -176,7 +178,7 @@ def get_managed_orders():
                 '%H:%M %d/%m/%Y')
         return result
 
-
+# возвращает заказы по заданному кластеру
 def get_orders_by_cluster(cl_num):
     with engine.connect() as conn:
         stmt = (
@@ -186,7 +188,7 @@ def get_orders_by_cluster(cl_num):
         result = conn.execute(stmt)
         return list(map(lambda x: x._asdict(), result))
 
-
+# возвращает заказ по id
 def get_order_by_id(order_id):
     with engine.connect() as conn:
         stmt = orders.select().where(orders.c.order_id == order_id)
@@ -196,32 +198,15 @@ def get_order_by_id(order_id):
             return result._asdict()
         return None
 
-
+# возвращает заказы по del_service_id
 def get_orders_by_del_service_id(del_service_id):
     with engine.connect() as conn:
-        stmt = select(orders.c.order_id).where(
+        stmt = orders.select().where(
             orders.c.del_service_id == del_service_id)
         result = conn.execute(stmt)
-        return list(map(lambda x: x._asdict()['order_id'], result))
+        return list(map(lambda x: x._asdict(), result))
 
-
-def get_invoice_fileslist():
-    with engine.connect() as conn:
-        stmt = (
-            select(orders.c.invoice_file_name, orders.c.date_managed, orders.c.order_id).
-            where(orders.c.invoice_file_name != None).
-            order_by(desc(orders.c.date_managed))
-        )
-        result = conn.execute(stmt)
-
-        result = list(map(lambda x: x._asdict(), result))
-        # result.sort(key=lambda x: x['date_managed'])
-        for i, _ in enumerate(result):
-            result[i]['date_managed'] = result[i]['date_managed'].strftime(
-                '%H:%M %d/%m/%Y')
-        return result
-
-
+# устанавливает новый номер кластера для множества заказов
 def upd_cluster_num(orders_ids, new_cluster_num):
     with engine.connect() as conn:
         for order_id in orders_ids:
@@ -232,7 +217,7 @@ def upd_cluster_num(orders_ids, new_cluster_num):
             )
             conn.execute(stmt)
 
-
+# устанавливает новый порядок в кластере
 def upd_cluster_seq(orders_ids):
     with engine.connect() as conn:
         for i, order_id in enumerate(orders_ids):
@@ -243,7 +228,7 @@ def upd_cluster_seq(orders_ids):
             )
             conn.execute(stmt)
 
-
+# делает запись о том, что множество заказов зарегестрировано в яндексе
 def register_cluster_in_yandex(orders_ids, yandex_id):
     with engine.connect() as conn:
         for i, order_id in enumerate(orders_ids):
@@ -255,7 +240,7 @@ def register_cluster_in_yandex(orders_ids, yandex_id):
             )
             conn.execute(stmt)
 
-
+# делает запись о том, что множество заказов зарегестрировано в для курьера
 def create_invoice_for_cluster(orders_ids, invoice_file_name, cluster_uuid):
     with engine.connect() as conn:
         for i, order_id in enumerate(orders_ids):
@@ -267,7 +252,7 @@ def create_invoice_for_cluster(orders_ids, invoice_file_name, cluster_uuid):
             )
             conn.execute(stmt)
 
-
+# расформировывает заказ для курьера/яндекса
 def drop_formed_order(order_uuid):
     with engine.connect() as conn:
         stmt = (
@@ -278,7 +263,7 @@ def drop_formed_order(order_uuid):
         )
         conn.execute(stmt)
 
-
+# убирает конкретный заказ из яндекса/курьера
 def pop_from_formed_order(order_id):
     drop_old_orders()
     with engine.connect() as conn:
@@ -289,13 +274,3 @@ def pop_from_formed_order(order_id):
                    del_service_id=None, invoice_file_name=None)
         )
         conn.execute(stmt)
-
-
-def count_orders_for_ivoice_file(filename):
-    with engine.connect() as conn:
-        stmt = (
-            select(orders).
-            where(orders.c.invoice_file_name == filename)
-        )
-        result = len(conn.execute(stmt).fetchall())
-    return result

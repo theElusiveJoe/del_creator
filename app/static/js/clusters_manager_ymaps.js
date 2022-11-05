@@ -188,7 +188,7 @@ $("#pdf_btn").click(
         if (orders.length > 0){
             $.ajax({
                 type: "POST",
-                url: "/admin/create_pdf_for_cluster",
+                url: "/admin/create_invoice",
                 data: JSON.stringify({
                     orders_ids: orders
                 }),
@@ -208,6 +208,10 @@ $("#pdf_btn").click(
                 }
             });
         }
+        var link = document.createElement('a')
+        link.setAttribute('href', '/admin/get_invoice/'+orders[0])
+        link.setAttribute('target', '_blank')
+        link.click()
     }
 )
 

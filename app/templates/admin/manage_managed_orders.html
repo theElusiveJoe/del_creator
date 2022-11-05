@@ -27,6 +27,7 @@
                 <th>расформировать всё</th>
                 <th>убрать этот</th>
                 <th>редактировать</th>
+                <th>накладная</th>
             </tr>
         </thead>
         <tbody>
@@ -48,6 +49,10 @@
 
                 <th> {% if order['del_service'] != 'yandex': %}
                     <button onclick="edit_order('{{order["order_id"]}}')"> редактировать </button>
+                    {% endif %}
+                </th>
+                <th>{% if order['del_service'] != 'yandex': %}
+                    <button onclick="get_invoice('{{order["order_id"]}}')"> накладная </button>
                     {% endif %}
                 </th>
             </tr>
