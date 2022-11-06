@@ -52,6 +52,11 @@
                     <p class="lead mb-1" style="font-weight: 450;">{{order['name']}}
                         <strwong class="biba">{{order['phone']}}</strong>
                     </p>
+                    {% if order['comment'] != ''%}
+                    <p class="lead mb-1">Комментарии к заказу:
+                        <strong class="biba">{{order['comment']}}</strong>
+                    </p>
+                    {% endif %}
                 </div>
                 {% if not order['paid']: %}
                 <div class="col-3 text-center">
