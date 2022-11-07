@@ -46,7 +46,7 @@
 
                 <div class="form-group w-50">
                         <label>id заказа</label>
-                        <input type="text" class="form-control" name="order_id" value="{{primary_info['order_id']}}"
+                        <input type="text" class="form-control" name="order_id" value="{% if primary_info['account_number'] == '' %}{{primary_info['order_id']}}{% else %}{{primary_info['account_number']}}{% endif %}"
                                 required>
                 </div>
 
@@ -111,7 +111,7 @@
 
         <label><b>Деньги</b></label><br>
         <label>{{ primary_info['cache'] }}</label><label>{{ primary_info['emoney'] }}</label><br>
-        <label>{% if primary_info['paid']: %} уже оплачено, курьер не берет деньги {% else : %} не полачено, курьер
+        <label>{% if primary_info['paid']: %} уже оплачено, курьер не берет деньги {% else : %} не оплачено, курьер
                 должен взять деньги {% endif %}</label><br>
 
         <br>

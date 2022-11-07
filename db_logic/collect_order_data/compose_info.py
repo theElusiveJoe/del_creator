@@ -20,6 +20,8 @@ def get_order_full_info(order_id):
     row, by_account = get_order_line_from_ghseets(order_id.strip())
     if by_account:
         return row, raw_zippack_order
+    
+    order_id = row['id'] 
     if ord('A') <= ord(order_id.strip()[0]) <= ord('Z'):
         try:
             return row, get_order_from_zippack(re.sub("\D", "", order_id))
@@ -28,7 +30,7 @@ def get_order_full_info(order_id):
             log.error('Проблема с зиппаком')
     else:
         try:
-             return row, get_order_from_mail(order_id)
+            return row, get_order_from_mail(order_id)
         except Exception:
             log.exception('')
             log.error('Проблема с почтой')
@@ -55,7 +57,7 @@ def get_order_line_from_ghseets_for_yandex_user(order_id):
         raise Exception('Проблемы с гугл таблицей')
 
 def get_order_info_for_local_order(order_id):
-    gsheets_info, shop_info = get_order_full_info(order_id)
+    gsheets_info, shop_info = get_order_full_info(order_id.strip())
 
     print(json.dumps(gsheets_info, indent=4, ensure_ascii=False))
     print(json.dumps(shop_info, indent=4, ensure_ascii=False))
@@ -63,6 +65,7 @@ def get_order_info_for_local_order(order_id):
     result = dict()
 
     result['order_id'] = gsheets_info['id']
+    result['account_number'] = gsheets_info['account_number']
     result['pay_type'] = gsheets_info['payment_method']
     result['cache'] = gsheets_info['cache']
     result['emoney'] = gsheets_info['emoney']

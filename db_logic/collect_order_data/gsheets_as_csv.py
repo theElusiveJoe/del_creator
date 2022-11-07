@@ -38,6 +38,7 @@ def download_order_row(order_id):
                  'Статус': 'status',
                  'примечания': 'comment2',
                  'warehouse': 'warehouse'})
+    print('LOOOOOKING FOR', order_id)
     row = table[(table['id'] == order_id ) | (table['account_number'] == order_id)].iloc[0].fillna('').to_dict()
     row['emoney'] = to_int(row['emoney'])
     row['cache'] = to_int(row['cache'])

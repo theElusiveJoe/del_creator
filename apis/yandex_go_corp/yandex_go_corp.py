@@ -143,7 +143,8 @@ def create_modules(order_id):
         'external_order_id': local['order_id'],
         'point_id': local['seq_num'],
         'type': 'destination',
-        'visit_order': local['seq_num']
+        'visit_order': local['seq_num'],
+        'skip_confirmation': True
     }
 
     if not local['paid']:

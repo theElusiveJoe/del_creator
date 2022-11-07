@@ -87,7 +87,7 @@ function load_orders() {
                 $("<td>").html(order["order_id"]).appendTo(tr)
                 $("<td>").html(order["del_time_interval"]).appendTo(tr)
                 $("<td>").html(order["fullname"]).appendTo(tr)
-                $("<td>").html(order["paid"] ? 'оплачено' : 'не полачено').appendTo(tr)
+                $("<td>").html(order["paid"] ? 'оплачено' : 'не оплачено').appendTo(tr)
                 $("<td>").html(order["weight"]).appendTo(tr)
                 $("<td>").html(order["positions"]).appendTo(tr)
                 $("<td>").html(order["comment"]).appendTo(tr)

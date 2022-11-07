@@ -221,7 +221,8 @@ def drop_managed():
 
     the_order = local_db.get_order_by_id(request.form['order_id'])
     if the_order['del_service'] == 'yandex':
-        code, message = cancel_yandex_order(the_order['del_service_id'])
+        pass
+        # code, message = cancel_yandex_order(the_order['del_service_id'])
     local_db.drop_formed_order(the_order['del_service_id'])
 
     return 'ok'
