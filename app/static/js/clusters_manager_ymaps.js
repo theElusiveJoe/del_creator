@@ -44,7 +44,7 @@ function load_orders(cl_num) {
         },
         success: function (result) {
             var orders = JSON.parse(result)['orders']
-
+            document.querySelector("#total").innerHTML = "Всего заказов: " + orders.length
             clusters = []
             points = []
 
@@ -129,16 +129,24 @@ function create_route_on_map(ev, ui) {
         new_points.push(point)
     }
 
-    if (!route_obj) {
-        route_obj = new ymaps.multiRouter.MultiRoute({
-            referencePoints: new_points
-        }, {
-            boundsAutoApply: true
-        });
-        map_obj.geoObjects.add(route_obj);
-    } else {
-        route_obj.model.setReferencePoints(new_points)
-    }
+    console.log('ROUTING POINTS', new_points)
+
+    // if (!route_obj) {
+    //     route_obj = new ymaps.multiRouter.MultiRoute({
+    //         referencePoints: new_points
+    //     }, {
+    //         boundsAutoApply: true
+    //     });
+    //     map_obj.geoObjects.add(route_obj);
+    // } else {
+    //     route_obj.model.setReferencePoints(new_points)
+    // }
+    route_obj = new ymaps.multiRouter.MultiRoute({
+        referencePoints: new_points
+    }, {
+        boundsAutoApply: true
+    });
+    map_obj.geoObjects.add(route_obj);
 }
 
 
