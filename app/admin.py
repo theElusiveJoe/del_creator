@@ -161,7 +161,7 @@ def get_clusters_nums():
 def upd_cluster():
     local_db.upd_cluster_num(
         request.json['orders_ids'], request.json['new_cluster_num'])
-    return 0
+    return 'ok'
 
 
 @bp.route('/register_cluster_in_yandex', methods=['POST'])

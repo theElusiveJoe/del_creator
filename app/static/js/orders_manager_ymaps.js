@@ -27,7 +27,7 @@ var cluster_color_mapping = {
 }
 
 
-function delete_order(order_i_d){
+function delete_order(order_i_d) {
     $.ajax({
         type: "POST",
         url: "/admin/del_order",
@@ -73,18 +73,18 @@ function load_orders() {
         url: "/admin/get_unmanaged_orders",
         success: function (result) {
             var orders = JSON.parse(result)['orders']
-            orders.sort((a,b) => (a.cluster > b.cluster) ? 1 : -1)
+            orders.sort((a, b) => (a.cluster > b.cluster) ? 1 : -1)
             console.log(orders)
 
-            clusters = [],
-            points = [],
+            clusters = []
+            points = []
             document.querySelector("#total").innerHTML = "Всего заказов: " + orders.length
             document.querySelector("#dropdown_cluster_variants").innerHTML = ""
             // для каждого заказа:
             for (const order of orders) {
                 // создаем строчку
                 var tr = document.createElement("tr")
-                tr.id = 'order'+order["order_id"]
+                tr.id = 'order' + order["order_id"]
                 $("<td>").html(order["cluster"]).appendTo(tr)
                 $("<td>").html(order["order_id"]).appendTo(tr)
                 $("<td>").html(order["del_time_interval"]).appendTo(tr)
@@ -99,10 +99,10 @@ function load_orders() {
                 // </th>
                 var del_btn = document.createElement("button")
                 del_btn.innerHTML = "del"
-                del_btn.onclick = function(){ delete_order(order['order_id'])}
+                del_btn.onclick = function () { delete_order(order['order_id']) }
                 var edit_btn = document.createElement("button")
                 edit_btn.innerHTML = "edit"
-                edit_btn.onclick = function(){edit_order(order['order_id'])}
+                edit_btn.onclick = function () { edit_order(order['order_id']) }
                 var td = document.createElement("td")
                 td.append(del_btn)
                 tr.append(td)
@@ -142,18 +142,17 @@ function load_orders() {
                 map_obj.geoObjects.add(new_point)
             }
 
-            clusters =  [...new Set(clusters)]
+            clusters = [...new Set(clusters)]
             clusters.sort()
             console.log('Clusters:', clusters)
             console.log('Points:', points)
-            for(const cl_num in clusters){
+            for (const cl_num in clusters) {
                 var b = document.createElement("button")
                 b.innerHTML = clusters[cl_num]
                 b.style = "width: 180px"
                 b.classList.add("btn")
                 b.classList.add("btn-secondary")
-                console.log("NEW CLUSTER BUTTON:", clusters[cl_num])
-                b.onclick = function (){
+                b.onclick = function () {
                     set_new_cluster(collect_selected_ids(), clusters[cl_num])
                     load_orders()
                 }
@@ -166,7 +165,7 @@ function load_orders() {
         }
     });
 
-    
+
 }
 
 
@@ -194,9 +193,9 @@ function set_new_cluster(selected_ids, new_cluster_num) {
     });
 }
 
-$('.dropdown').hover(function(){ 
-    $('.dropdown-toggle', this).trigger('click'); 
-  });
+$('.dropdown').hover(function () {
+    $('.dropdown-toggle', this).trigger('click');
+});
 
 $("#drop_claster_button").click(function () {
     set_new_cluster(collect_selected_ids(), 0)
@@ -205,8 +204,8 @@ $("#drop_claster_button").click(function () {
 
 $("#new_claster_button").click(function () {
     var i;
-    for (i = 1; i < 14; i++){
-        if (! clusters.includes(i)){
+    for (i = 1; i < 14; i++) {
+        if (!clusters.includes(i)) {
             break
         }
     }
@@ -219,21 +218,17 @@ $("#new_claster_button").click(function () {
 // )
 
 function edit_order(order_id) {
-    location.href = '/admin/add_order.html?order_id='+order_id+'&protection=False'
+    location.href = '/admin/add_order.html?order_id=' + order_id + '&protection=False'
 }
 
 function create_route_on_map() {
     console.log('Placing points: ', points)
-    if (!route_obj) {
-        route_obj = new ymaps.multiRouter.MultiRoute({
-            referencePoints: points
-        }, {
-            boundsAutoApply: true
-        });
-        map_obj.geoObjects.add(route_obj);
-    } else {
-        route_obj.model.setReferencePoints(points)
-    }
+    route_obj = new ymaps.multiRouter.MultiRoute({
+        referencePoints: points
+    }, {
+        boundsAutoApply: true
+    });
+    map_obj.geoObjects.add(route_obj);
 }
 
 ymaps.ready(load_orders)
