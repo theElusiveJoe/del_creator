@@ -46,7 +46,7 @@
 
                 <div class="form-group w-50">
                         <label>id заказа</label>
-                        <input type="text" class="form-control" name="order_id" value="{% if primary_info['account_number'] == '' %}{{primary_info['order_id']}}{% else %}{{primary_info['account_number']}}{% endif %}"
+                        <input type="text" class="form-control" name="order_id" value="{% if primary_info['account_number'] == '' or 'account_number' not in primary_info %}{{primary_info['order_id']}}{% else %}{{primary_info['account_number']}}{% endif %}"
                                 required>
                 </div>
 

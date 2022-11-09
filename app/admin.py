@@ -202,6 +202,7 @@ def get_invoice_file(order_id):
     the_order = local_db.get_order_by_id(order_id)
     del_service_id = the_order['del_service_id']
     orders = local_db.get_orders_by_del_service_id(del_service_id)
+    orders.sort(key = lambda x: x['seq_num'])
     print('THE ORDERS:', orders)
     return render_template('/admin/invoice.html', orders=orders)
 

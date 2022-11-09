@@ -147,8 +147,6 @@ def add_order(form, gsheets):
                 size_z=size_z/100,
                 del_time_interval=gsheets['del_time_interval']
             )
-        stmt2 = stmt2
-
         result = conn.execute(stmt2)
 
 # возвращает заказы, для которых не выбран del_service

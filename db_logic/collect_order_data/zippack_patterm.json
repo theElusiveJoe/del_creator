@@ -4,7 +4,7 @@
         "Id": null,
         "Number": "",
         "Currency": "",
-        "Sum": 0,
+        "Sum": "0",
         "Date": null,
         "CustomerComment": "",
         "AdminComment": "",

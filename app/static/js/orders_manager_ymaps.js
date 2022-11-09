@@ -1,5 +1,6 @@
 var points
 var map_obj;
+var route_obj;
 var clusters
 
 var cluster_color_mapping = {
@@ -77,6 +78,7 @@ function load_orders() {
 
             clusters = [],
             points = [],
+            document.querySelector("#total").innerHTML = "Всего заказов: " + orders.length
             document.querySelector("#dropdown_cluster_variants").innerHTML = ""
             // для каждого заказа:
             for (const order of orders) {
@@ -91,12 +93,21 @@ function load_orders() {
                 $("<td>").html(order["weight"]).appendTo(tr)
                 $("<td>").html(order["positions"]).appendTo(tr)
                 $("<td>").html(order["comment"]).appendTo(tr)
+                // <th> {% if order['del_service'] != 'yandex': %}
+                //     <button onclick="edit_order('{{order["order_id"]}}')"> редактировать </button>
+                //     {% endif %}
+                // </th>
                 var del_btn = document.createElement("button")
                 del_btn.innerHTML = "del"
                 del_btn.onclick = function(){ delete_order(order['order_id'])}
-                // tr.childNodes.push(del_btn)
+                var edit_btn = document.createElement("button")
+                edit_btn.innerHTML = "edit"
+                edit_btn.onclick = function(){edit_order(order['order_id'])}
                 var td = document.createElement("td")
                 td.append(del_btn)
+                tr.append(td)
+                var td = document.createElement("td")
+                td.append(edit_btn)
                 tr.append(td)
                 document.querySelector("#orders_list").appendChild(tr)
                 tr.onclick = function () { click_on_order(order["order_id"]) }
@@ -150,8 +161,12 @@ function load_orders() {
                 l.appendChild(b)
                 document.querySelector("#dropdown_cluster_variants").appendChild(l)
             }
+
+            create_route_on_map()
         }
     });
+
+    
 }
 
 
@@ -202,5 +217,23 @@ $("#new_claster_button").click(function () {
 // $("#upd_claster_button").click(
 //     () => set_new_cluster(collect_selected_ids(), 0)
 // )
+
+function edit_order(order_id) {
+    location.href = '/admin/add_order.html?order_id='+order_id+'&protection=False'
+}
+
+function create_route_on_map() {
+    console.log('Placing points: ', points)
+    if (!route_obj) {
+        route_obj = new ymaps.multiRouter.MultiRoute({
+            referencePoints: points
+        }, {
+            boundsAutoApply: true
+        });
+        map_obj.geoObjects.add(route_obj);
+    } else {
+        route_obj.model.setReferencePoints(points)
+    }
+}
 
 ymaps.ready(load_orders)
