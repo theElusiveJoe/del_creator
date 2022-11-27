@@ -131,22 +131,22 @@ function create_route_on_map(ev, ui) {
 
     console.log('ROUTING POINTS', new_points)
 
-    // if (!route_obj) {
-    //     route_obj = new ymaps.multiRouter.MultiRoute({
-    //         referencePoints: new_points
-    //     }, {
-    //         boundsAutoApply: true
-    //     });
-    //     map_obj.geoObjects.add(route_obj);
-    // } else {
-    //     route_obj.model.setReferencePoints(new_points)
-    // }
-    route_obj = new ymaps.multiRouter.MultiRoute({
-        referencePoints: new_points
-    }, {
-        boundsAutoApply: true
-    });
-    map_obj.geoObjects.add(route_obj);
+    if (!route_obj) {
+        route_obj = new ymaps.multiRouter.MultiRoute({
+            referencePoints: new_points
+        }, {
+            boundsAutoApply: true
+        });
+        map_obj.geoObjects.add(route_obj);
+    } else {
+        route_obj.model.setReferencePoints(new_points)
+    }
+    // route_obj = new ymaps.multiRouter.MultiRoute({
+    //     referencePoints: new_points
+    // }, {
+    //     boundsAutoApply: true
+    // });
+    // map_obj.geoObjects.add(route_obj);
 }
 
 

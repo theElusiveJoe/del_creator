@@ -255,9 +255,10 @@ def drop_formed_order(order_uuid):
     with engine.connect() as conn:
         stmt = (
             update(orders).
-            where(orders.c.del_service_id == order_uuid).
             values(cluster=0, del_service=None, date_managed=None,
-                   del_service_id=None, invoice_file_name=None)
+                   del_service_id=None, invoice_file_name=None).
+            where(orders.c.del_service_id == order_uuid)
+            
         )
         conn.execute(stmt)
 

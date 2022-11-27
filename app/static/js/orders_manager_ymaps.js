@@ -161,7 +161,7 @@ function load_orders() {
                 document.querySelector("#dropdown_cluster_variants").appendChild(l)
             }
 
-            create_route_on_map()
+            // create_route_on_map()
         }
     });
 
