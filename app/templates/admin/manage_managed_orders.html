@@ -39,7 +39,7 @@ src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
             {% for order in orders: %}
             <tr>
                 <th> {{order['order_id']}}</th>
-                <th> {{order['date_managed']}}</th>
+                <th data-order="{{order['timestamp']}}"> {{order['date_managed']}}</th>
                 <th> {% if order['del_service'] == 'carrier' %} наш курьер {% else %} Yandex Go {% endif %}</th>
                 <th> {{order['fullname']}}</th>
                 <th> {{order['del_service_id'] if order['del_service'] == 'yandex' else order['invoice_file_name']}}

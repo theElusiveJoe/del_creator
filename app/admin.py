@@ -13,6 +13,7 @@ import os
 import hashlib
 import phonenumbers
 import uuid
+from datetime import datetime
 
 handler = logging.StreamHandler(stream=sys.stdout)
 log = logging.getLogger(__name__)
@@ -214,6 +215,11 @@ def manage_manage_orders():
 
     if request.method == 'GET':
         orders = local_db.get_managed_orders()
+        for i, x in enumerate(orders):
+            x = x['date_managed']
+            x = datetime.strptime(x, r'%H:%M %d/%m/%Y')
+            orders[i]['timestamp'] = int(round(x.timestamp()))
+            orders[i]['date_managed'] = x.strftime(r'%d.%m %H:%M')
         return render_template('/admin/manage_managed_orders.html', orders=orders)
 
 
