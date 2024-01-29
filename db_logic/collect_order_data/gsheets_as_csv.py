@@ -43,7 +43,7 @@ def download_order_row(order_id):
     row['emoney'] = to_int(row['emoney'])
     row['cache'] = to_int(row['cache'])
     row['paid'] = row['paid'] == 'оплачено'
-    row['positions'] = to_int(row['positions']) if len(row['positions']) > 0 else 0
+    row['positions'] = to_int(str(row['positions'])) if len(str(row['positions'])) > 0 else 0
     if row['id'] == '':
         row['id'] = row['account_number']
     print(row)
