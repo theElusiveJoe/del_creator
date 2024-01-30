@@ -70,6 +70,7 @@ def drop_old_orders():
                     where(orders.c.order_id == order['order_id'])
                 )
                 conn.execute(stmt)
+                conn.commit()
 
 # добавляет/обновляет заказ
 def add_order(form, gsheets):
@@ -117,7 +118,7 @@ def add_order(form, gsheets):
                 cluster='0',
 
                 weight=float(str(gsheets['weight']).replace(',', '.')),
-                positions=int(gsheets['positions']),
+                positions=int(float(gsheets['positions'])),
                 size_x=size_x/100,
                 size_y=size_y/100,
                 size_z=size_z/100,
@@ -141,13 +142,14 @@ def add_order(form, gsheets):
                 cluster='0',
 
                 weight=float(str(gsheets['weight']).replace(',', '.')),
-                positions=int(gsheets['positions']),
+                positions=int(float(gsheets['positions'])),
                 size_x=size_x/100,
                 size_y=size_y/100,
                 size_z=size_z/100,
                 del_time_interval=gsheets['del_time_interval']
             )
         result = conn.execute(stmt2)
+        conn.commit()
 
 # возвращает заказы, для которых не выбран del_service
 def get_unmanaged_orders():
@@ -214,6 +216,7 @@ def upd_cluster_num(orders_ids, new_cluster_num):
                 values(cluster=new_cluster_num)
             )
             conn.execute(stmt)
+            conn.commit()
 
 # устанавливает новый порядок в кластере
 def upd_cluster_seq(orders_ids):
@@ -225,6 +228,7 @@ def upd_cluster_seq(orders_ids):
                 values(seq_num=i+2)
             )
             conn.execute(stmt)
+            conn.commit()
 
 # делает запись о том, что множество заказов зарегестрировано в яндексе
 def register_cluster_in_yandex(orders_ids, yandex_id):
@@ -237,6 +241,7 @@ def register_cluster_in_yandex(orders_ids, yandex_id):
                        del_service_id=yandex_id, date_managed=datetime.datetime.now())
             )
             conn.execute(stmt)
+            conn.commit()
 
 # делает запись о том, что множество заказов зарегестрировано в для курьера
 def create_invoice_for_cluster(orders_ids, invoice_file_name, cluster_uuid):
@@ -249,6 +254,7 @@ def create_invoice_for_cluster(orders_ids, invoice_file_name, cluster_uuid):
                        invoice_file_name=invoice_file_name, date_managed=datetime.datetime.now(), del_service_id=cluster_uuid)
             )
             conn.execute(stmt)
+            conn.commit()
 
 # расформировывает заказ для курьера/яндекса
 def drop_formed_order(order_uuid):
@@ -261,6 +267,7 @@ def drop_formed_order(order_uuid):
             
         )
         conn.execute(stmt)
+        conn.commit()
 
 # убирает конкретный заказ из яндекса/курьера
 def pop_from_formed_order(order_id):
@@ -273,3 +280,4 @@ def pop_from_formed_order(order_id):
                    del_service_id=None, invoice_file_name=None)
         )
         conn.execute(stmt)
+        conn.commit()
