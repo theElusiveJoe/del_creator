@@ -56,6 +56,7 @@ def del_order(order_id):
             where(orders.c.order_id == order_id)
         )
         conn.execute(stmt)
+        conn.commit()
 
 # удаляет все старые заказы
 def drop_old_orders():
